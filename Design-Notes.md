@@ -1,10 +1,7 @@
-﻿F# Compatibility Library for OCaml
+﻿### OCaml Compatibility Library for F# ###
 (FSharpx.Compatibility.OCaml)
 
-
--------------------------------------------------------------------------------
-Design / Implementation Notes
--------------------------------------------------------------------------------
+## Design / Implementation Notes ##
 
 -	Some modules are already implemented in the F# PowerPack (under the
 	FSharp.PowerPack.Compatibility namespace). However, not all of these modules
@@ -52,7 +49,4 @@ Design / Implementation Notes
 	the System.Collections.Generic.Stack type.
 -	The Format module needs to be re-implemented from scratch using the documentation
 	available on the OCaml website.
-
-
-
 
