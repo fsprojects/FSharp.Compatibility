@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>8fd9ffe7-3d57-4895-a5b6-adf2a06120bc</ProjectGuid>
+    <ProjectGuid>{7b5b561f-00e6-4e62-a9ed-45995cb00e81}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>FSharpx.Compatibility.OCaml.Format</RootNamespace>
     <AssemblyName>FSharpx.Compatibility.OCaml.Format</AssemblyName>
@@ -39,8 +39,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module1.fs" />
-    <None Include="Script.fsx" />
+    <Compile Include="Format.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="!Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
