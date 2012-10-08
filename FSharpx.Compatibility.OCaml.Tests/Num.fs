@@ -22,11 +22,57 @@ let ``0 does not equal 1``() =
     (Int 0) = (Int 1)
     |> should equal false
 
+(* op_Division *)
+
 [<Test>]
 [<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
-let ``divide by zero raises exception``() =
+let ``division by zero raises exception``() =
     (Int 1) / (Int 0)
     |> ignore
+
+[<Test>]
+let ``division should not truncate result``() =
+    let result = (Int 2) / (Int 3)
+    result.IsZero
+    |> should equal false
+
+(* op_Modulus *)
+
+[<Test>]
+[<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
+let ``mod_num zero divisor raises exception``() =
+    mod_num (Int 1) (Int 0)
+    |> ignore
+
+[<Test>]
+let ``mod_num test 1``() =
+    let numerator = (Int 4) / (Int 9)
+    mod_num numerator (Int 2)
+    |> should equal numerator
+
+[<Test>]
+let ``mod_num test 2``() =
+    let result = mod_num ((Int 4) / (Int 9)) ((Int 2) / (Int 9))
+    result.IsZero
+    |> should equal true
+
+
+(* Quotient *)
+
+[<Test>]
+[<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
+let ``quo_num zero divisor raises exception``() =
+    quo_num (Int 1) (Int 0)
+    |> ignore
+
+[<Test>]
+let ``quo_num should truncate result``() =
+    let result = quo_num (Int 2) (Int 3)
+    result.IsZero
+    |> should equal true
+
+
+(* Parse and num_of_string *)
 
 [<Test>]
 let ``num_of_string parse integer``() =
@@ -46,11 +92,6 @@ let ``num_of_string invalid string``() =
     num_of_string "123.4"
     |> ignore
 
-[<Test>]
-let ``division should not truncate result``() =
-    let result = (Int 2) / (Int 3)
-    result.IsZero
-    |> should equal false
 
 
 

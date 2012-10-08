@@ -185,11 +185,10 @@ type Num =
             | Ratio x, Ratio y ->
                 x, y
 
-        Ratio (x / y)
+        // Divide the values and create a Ratio from the result.
+        // Attempt to reduce the result before returning it.
+        Num.FromBigRational (x / y)
 
-    // NOTE : This is the standard integer division operator.
-    // E.g., (Int 20) / (Int 4) = Int 5 and (Int 20) / (Int 3) = Int 6.
-    // TODO : Determine how the cases with Ratio are implemented.
     static member Quotient (x : Num, y : Num) : Num =
         match x, y with
         (*  Check for division by zero. *)
@@ -204,27 +203,18 @@ type Num =
         | Int x, Big_int y ->
             (bigint x) / y
             |> Num.FromBigInt
-        | Int x, Ratio y ->
-            (BigRational.FromInt x) / y
-            |> Num.FromBigRational
         | Big_int x, Int y ->
             x / (bigint y)
             |> Num.FromBigInt
         | Big_int x, Big_int y ->
             x / y
             |> Num.FromBigInt
-        | Big_int x, Ratio y ->
-            (BigRational.FromBigInt x) / y
-            |> Num.FromBigRational
-        | Ratio x, Int y ->
-            x / (BigRational.FromInt y)
-            |> Num.FromBigRational
-        | Ratio x, Big_int y ->
-            x / (BigRational.FromBigInt y)
-            |> Num.FromBigRational
-        | Ratio x, Ratio y ->
-            x / y
-            |> Num.FromBigRational
+        | Int _, Ratio _
+        | Big_int _, Ratio _
+        | Ratio _, Int _
+        | Ratio _, Big_int _
+        | Ratio _, Ratio _ ->
+            Num.Floor (x / y)
 
     static member op_Modulus (x : Num, y : Num) : Num =
         match x, y with
@@ -250,7 +240,7 @@ type Num =
         | Ratio _, Int _
         | Ratio _, Big_int _
         | Ratio _, Ratio _ ->
-            raise <| System.NotImplementedException "Num.op_Modulus"
+            x - (y * Num.Quotient (x, y))
 
     static member op_UnaryNegation (x : Num) : Num =
         match x with
@@ -547,7 +537,7 @@ let inline quo_num (x : num) (y : num) : num =
 
 //
 let inline mod_num (x : num) (y : num) : num =
-    num.op_Modulus (x, y)
+    x % y
 
 //
 let inline ( **/ ) (x : num) (y : num) : num =
