@@ -36,12 +36,15 @@ type Num =
     // Arbitrary-precision rational.
     | Ratio of BigRational
 
+    //
     static member Zero
         with get () = Int 0
 
+    //
     static member One
         with get () = Int 1
 
+    //
     static member (*inline*) private FromInt64 (value : int64) : Num =
         if value > (int64 Int32.MaxValue) ||
             value < (int64 Int32.MinValue) then
@@ -49,6 +52,7 @@ type Num =
         else
             Int <| int value
 
+    //
     static member (*inline*) private FromBigInt (value : bigint) : Num =
         // OPTIMIZE : Create static (let-bound) values to hold bigint versions
         // of Int32.MinValue and Int32.MaxValue
@@ -58,7 +62,8 @@ type Num =
         else
             Int <| int value
 
-    static member private FromBigRational (value : BigRational) =
+    //
+    static member (*inline*) private FromBigRational (value : BigRational) =
         // Determine if the BigRational represents a whole (i.e., non-fractional)
         // quantity; if so, convert it to an int or bigint.
         if (value.Numerator % value.Denominator).IsZero then
@@ -189,6 +194,7 @@ type Num =
         // Attempt to reduce the result before returning it.
         Num.FromBigRational (x / y)
 
+    //
     static member Quotient (x : Num, y : Num) : Num =
         match x, y with
         (*  Check for division by zero. *)
@@ -255,9 +261,7 @@ type Num =
         | Ratio x ->
             Ratio -x
 
-    static member inline op_Explicit (r : int) : Num =
-        Int r
-
+    //
     static member Abs (x : Num) : Num =
         match x with
         | Int x ->
@@ -275,6 +279,7 @@ type Num =
             BigRational.Abs x
             |> Ratio
 
+    //
     static member Max (x : Num, y : Num) =
         match x, y with
         | Int a, Int b ->
@@ -296,6 +301,7 @@ type Num =
         | ((Ratio b) as y), ((Big_int a) as x) ->
             if (BigRational.FromBigInt a) > b then x else y
 
+    //
     static member Min (x : Num, y : Num) =
         match x, y with
         | Int a, Int b ->
@@ -317,6 +323,7 @@ type Num =
         | ((Ratio b) as y), ((Big_int a) as x) ->
             if (BigRational.FromBigInt a) < b then x else y
 
+    //
     static member Pow (x : Num, y : Num) : Num =
         match y with
         | Int y ->
@@ -325,8 +332,10 @@ type Num =
             // TODO : Implement this case -- it works in the original OCaml module.
             raise <| System.NotImplementedException "Num.Pow (Num, Num)"
         | Ratio _ ->
+            // TODO : This could actually be implemented, if it would be useful.
             raise <| System.NotSupportedException "Cannot raise a Num to a fractional (Ratio) power."
 
+    //
     static member Pow (x : Num, y : int) : Num =
         match x with
         | Int x ->
@@ -339,6 +348,7 @@ type Num =
             BigRational.PowN (q, y)
             |> Num.FromBigRational
 
+    //
     static member Sign (x : Num) : int =
         match x with
         | Int x ->
@@ -348,6 +358,7 @@ type Num =
         | Ratio x ->
             x.Sign
 
+    //
     static member Ceiling (x : Num) : Num =
         match x with
         | Int _
@@ -358,6 +369,7 @@ type Num =
                 (q.Numerator / q.Denominator) + BigInteger.One
                 |> Num.FromBigInt
 
+    //
     static member Floor (x : Num) : Num =
         match x with
         | Int _
@@ -366,6 +378,7 @@ type Num =
             q.Numerator / q.Denominator
             |> Num.FromBigInt
 
+    //
     static member Round (x : Num) : Num =
         match x with
         | Int _
@@ -375,6 +388,7 @@ type Num =
             // NOTE : 1/2 rounds to 1.
             raise <| System.NotImplementedException "Num.Round"
 
+    //
     static member Truncate (x : Num) : Num =
         match x with
         | Int _
@@ -384,7 +398,15 @@ type Num =
             // containing the integer part of the Ratio.            
             raise <| System.NotImplementedException "Num.Truncate"
 
+    //
     static member Parse (str : string) : Num =
+        // Preconditions
+        if str = null then
+            raise <| ArgumentNullException "str"
+        elif String.length str < 1 then
+            ArgumentException ("The string is empty.", "str")
+            |> raise
+
         match BigInteger.TryParse str with
         | true, value ->
             Num.FromBigInt value
@@ -402,6 +424,7 @@ type Num =
         | Ratio q ->
             q.ToString ()
 
+    //
     member this.IsZero
         with get () =
             match this with
@@ -412,6 +435,7 @@ type Num =
             | Ratio q ->
                 q.Numerator.IsZero
 
+    //
     static member private AreEqual (x : Num, y : Num) : bool =
         match x, y with
         | Int a, Int b ->
@@ -512,30 +536,30 @@ let inline minus_num (x : num) : num =
 let inline ( -/ ) (x : num) (y : num) : num =
     x - y
 
-//
+/// Subtraction.
 let inline sub_num (x : num) (y : num) : num =
     x - y
 
 let inline ( */ ) (x : num) (y : num) : num =
     x * y
 
-//
+/// Multiplication.
 let inline mult_num (x : num) (y : num) : num =
     x * y
 
-//
+/// Square the number.
 let inline square_num (x : num) : num =
     x * x
 
-//
+/// Division.
 let inline div_num (x : num) (y : num) : num =
     x / y
 
-//
+/// Euclidian division.
 let inline quo_num (x : num) (y : num) : num =
     Num.Quotient (x, y)
 
-//
+/// Modulus division.
 let inline mod_num (x : num) (y : num) : num =
     x % y
 
@@ -543,11 +567,11 @@ let inline mod_num (x : num) (y : num) : num =
 let inline ( **/ ) (x : num) (y : num) : num =
     num.Pow (x, y)
 
-//
+/// Raise a number to an exponent.
 let inline power_num (x : num) (y : num) : num =
     num.Pow (x, y)
 
-//
+/// Absolute value.
 let inline abs_num (x : num) : num =
     num.Abs x
 
@@ -567,7 +591,7 @@ let incr_num (r : num ref) : unit =
 let decr_num (r : num ref) : unit =
     r := pred_num !r
 
-/// Test if a number is an integer
+/// Test if a number is an integer.
 let is_integer_num (n : num) : bool =
     match n with
     | Int _
@@ -657,33 +681,44 @@ let num_of_string (str : string) : num =
     // catch the exception then raise an OCaml-compatible exception.
     try
         num.Parse str
-    with _ ->
-        Exception ("num_of_string",
-            Exception (
-                sprintf "The string '%s' is not a valid representation of an integer." str))
+    with ex ->
+        Exception ("num_of_string", ex)
         |> raise
 
 (* Coercions between numerical types *)
 
+//
 let int_of_num (n : num) : int =
-    // NOTE : If 'n' is too large to fit into an 'int', then fail with
-    // the message "int_of_string" for compatbility with OCaml.
-    raise <| System.NotImplementedException "int_of_num"
+    match n with
+    | Int x -> x
+    | Big_int x ->
+        // TODO : If 'n' is too large to fit into an 'int', then fail with
+        // the message "int_of_string" for compatbility with OCaml.
+        raise <| System.NotImplementedException "int_of_num"
+    | Ratio q ->
+        // TODO : If 'q' can not be represented as an 'int', then fail with
+        // the message "int_of_string" for compatbility with OCaml.
+        raise <| System.NotImplementedException "int_of_num"
 
+//
 let inline num_of_int (r : int) : num =
     Int r
 
+//
 let nat_of_num (n : num) : nat =
     // TODO : Determine how to handle cases where 'n' is a Ratio or
     // is a Big_int whose value is too large for an 'int'.
     raise <| System.NotImplementedException "nat_of_num"
 
+//
 let num_of_nat (r : nat) : num =
     raise <| System.NotImplementedException "num_of_nat"
 
+//
 let inline num_of_big_int (i : bigint) : num =
     Big_int i
 
+//
 let big_int_of_num (n : num) : bigint =
     match n with
     | Int i ->
@@ -693,6 +728,7 @@ let big_int_of_num (n : num) : bigint =
     | Ratio q ->
         raise <| System.NotImplementedException "big_int_of_num"
 
+//
 let ratio_of_num (n : num) : BigRational =
     match n with
     | Int i ->
@@ -702,9 +738,11 @@ let ratio_of_num (n : num) : BigRational =
     | Ratio q ->
         q
 
+//
 let inline num_of_ratio (q : BigRational) : num =
     Ratio q
 
+//
 let float_of_num (n : num) : float =
     raise <| System.NotImplementedException "float_of_num"
 
