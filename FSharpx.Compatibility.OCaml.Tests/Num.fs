@@ -1,7 +1,7 @@
 ﻿(*  OCaml Compatibility Library for F#
     (FSharpx.Compatibility.OCaml)
 
-    Copyright © 2012 Jack Pappas (github.com/jack-pappas)
+    Copyright (c) 2012 Jack Pappas (github.com/jack-pappas)
 
     This code is available under the Apache 2.0 license.
     See the LICENSE file for the complete text of the license. *)
@@ -22,7 +22,29 @@ let ``0 does not equal 1``() =
     (Int 0) = (Int 1)
     |> should equal false
 
+[<Test>]
+[<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
+let ``divide by zero raises exception``() =
+    (Int 1) / (Int 0)
+    |> ignore
 
+[<Test>]
+let ``num_of_string parse integer``() =
+    let expectedValue = 1234
+    num_of_string (expectedValue.ToString ())
+    |> should equal (Int expectedValue)
+
+[<Test>]
+let ``num_of_string parse big integer``() =
+    let expectedValue = BigInteger.Parse "28492458193028194"
+    num_of_string (expectedValue.ToString ())
+    |> should equal (Big_int expectedValue)
+
+[<Test>]
+[<ExpectedException(typeof<exn>, ExpectedMessage = "num_of_string")>]
+let ``num_of_string invalid string``() =
+    num_of_string "123.4"
+    |> ignore
 
 
 

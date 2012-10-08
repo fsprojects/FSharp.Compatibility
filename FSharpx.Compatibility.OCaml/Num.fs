@@ -1,10 +1,15 @@
 ﻿(*  OCaml Compatibility Library for F#
     (FSharpx.Compatibility.OCaml)
 
-    Copyright © 2012 Jack Pappas (github.com/jack-pappas)
+    Copyright (c) 2012 Jack Pappas (github.com/jack-pappas)
 
     This code is available under the Apache 2.0 license.
     See the LICENSE file for the complete text of the license. *)
+
+// References:
+// http://caml.inria.fr/pub/docs/manual-ocaml/manual037.html
+// http://hal.inria.fr/docs/00/07/00/27/PDF/RT-0141.pdf
+
 
 /// <summary>Operation on arbitrary-precision numbers.</summary>
 /// <remarks>Numbers (type num) are arbitrary-precision rational numbers, plus the
@@ -150,14 +155,17 @@ type Num =
             x * y
             |> Num.FromBigRational
 
+    (* NOTE :   From testing the OCaml "nums.cma" library, it appears that
+                it "optimizes" the division operation by not performing it;
+                instead, it simply returns an instance of Ratio created from
+                the two input values. *)
     static member op_Division (x : Num, y : Num) : Num =
         match x, y with
-        (*  Cases to handle division-by-zero;
-            in OCaml, x / 0 = 0. *)
-        | _, Int 0 ->
-            Int 0
-        | _, Big_int y when y.IsZero ->
-            Int 0
+        (*  Check for division by zero. *)
+        | _, y when y.IsZero ->
+            Exception ("Division_by_zero",
+                DivideByZeroException ())
+            |> raise
 
         (* Standard cases *)
         | Int x, Int y ->
@@ -188,9 +196,13 @@ type Num =
             |> Num.FromBigRational
 
     static member op_Modulus (x : Num, y : Num) : Num =
-        (* TODO :   May need to add special case for when y = 0
-                    to ensure behavior is the same as in Ocaml. *)
         match x, y with
+        (* Check for division-by-zero. *)
+        | _, y when y.IsZero ->
+            Exception ("Division_by_zero",
+                DivideByZeroException ())
+            |> raise
+
         | Int x, Int y ->
             Int (x % y)
         | Int x, Big_int y ->
@@ -369,6 +381,16 @@ type Num =
         | Ratio q ->
             q.ToString ()
 
+    member this.IsZero
+        with get () =
+            match this with
+            | Int x ->
+                x = 0
+            | Big_int x ->
+                x.IsZero
+            | Ratio q ->
+                q.Numerator.IsZero
+
     static member private AreEqual (x : Num, y : Num) : bool =
         match x, y with
         | Int a, Int b ->
@@ -485,7 +507,10 @@ let inline square_num (x : num) : num =
 let inline div_num (x : num) (y : num) : num =
     x / y
 
-//
+// NOTE : This is the standard integer division operator.
+// E.g., (Int 20) / (Int 4) = Int 5 and (Int 20) / (Int 3) = Int 6.
+// However, we need to determine how the cases with Ratio
+// are implemented.
 let quo_num (x : num) (y : num) : num =
     match x, y with
     | Int x, Int y ->
@@ -508,26 +533,8 @@ let quo_num (x : num) (y : num) : num =
         raise <| System.NotImplementedException "quo_num"
 
 //
-let mod_num (x : num) (y : num) : num =
-    match x, y with
-    | Int x, Int y ->
-        Int (x % y)
-    | Int x, Big_int y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Int x, Ratio y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Big_int x, Int y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Big_int x, Big_int y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Big_int x, Ratio y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Ratio x, Int y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Ratio x, Big_int y ->
-        raise <| System.NotImplementedException "mod_num"
-    | Ratio x, Ratio y ->
-        raise <| System.NotImplementedException "mod_num"
+let inline mod_num (x : num) (y : num) : num =
+    num.op_Modulus (x, y)
 
 //
 let inline ( **/ ) (x : num) (y : num) : num =
@@ -644,19 +651,20 @@ let approx_num_exp (precision : int) (n : num) : string =
 /// Raise Failure "num_of_string" if the given string is not a valid representation of an integer
 let num_of_string (str : string) : num =
     // If the string can't be parsed (i.e., an exception was thrown),
-    // catch the exception then call "failwith" for
-    // compatibility with OCaml.
+    // catch the exception then raise an OCaml-compatible exception.
     try
         num.Parse str
     with _ ->
-        failwith "num_of_string"
-
+        Exception ("num_of_string",
+            Exception (
+                sprintf "The string '%s' is not a valid representation of an integer." str))
+        |> raise
 
 (* Coercions between numerical types *)
 
 let int_of_num (n : num) : int =
-    // TODO : Determine how to handle cases where 'n' is a Ratio or
-    // is a Big_int whose value is too large for an 'int'.
+    // NOTE : If 'n' is too large to fit into an 'int', then fail with
+    // the message "int_of_string" for compatbility with OCaml.
     raise <| System.NotImplementedException "int_of_num"
 
 let inline num_of_int (r : int) : num =
