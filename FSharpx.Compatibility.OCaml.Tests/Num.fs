@@ -46,5 +46,11 @@ let ``num_of_string invalid string``() =
     num_of_string "123.4"
     |> ignore
 
+[<Test>]
+let ``division should not truncate result``() =
+    let result = (Int 2) / (Int 3)
+    result.IsZero
+    |> should equal false
+
 
 

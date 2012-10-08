@@ -155,11 +155,42 @@ type Num =
             x * y
             |> Num.FromBigRational
 
-    (* NOTE :   From testing the OCaml "nums.cma" library, it appears that
-                it "optimizes" the division operation by not performing it;
-                instead, it simply returns an instance of Ratio created from
-                the two input values. *)
     static member op_Division (x : Num, y : Num) : Num =
+        // Preconditions
+        if y.IsZero then
+            Exception ("Division_by_zero",
+                DivideByZeroException ())
+            |> raise
+
+        (*  Don't perform the actual division operation -- just create a Ratio
+            from the inputs to avoid any possible truncation of the result. *)
+        let x, y =
+            match x, y with
+            | Int x, Int y ->
+                (BigRational.FromInt x), (BigRational.FromInt y)
+            | Int x, Big_int y ->
+                (BigRational.FromInt x), (BigRational.FromBigInt y)
+            | Int x, Ratio y ->
+                (BigRational.FromInt x), y
+            | Big_int x, Int y ->
+                (BigRational.FromBigInt x), (BigRational.FromInt y)
+            | Big_int x, Big_int y ->
+                (BigRational.FromBigInt x), (BigRational.FromBigInt y)
+            | Big_int x, Ratio y ->
+                (BigRational.FromBigInt x), y
+            | Ratio x, Int y ->
+                x, (BigRational.FromInt y)
+            | Ratio x, Big_int y ->
+                x, (BigRational.FromBigInt y)
+            | Ratio x, Ratio y ->
+                x, y
+
+        Ratio (x / y)
+
+    // NOTE : This is the standard integer division operator.
+    // E.g., (Int 20) / (Int 4) = Int 5 and (Int 20) / (Int 3) = Int 6.
+    // TODO : Determine how the cases with Ratio are implemented.
+    static member Quotient (x : Num, y : Num) : Num =
         match x, y with
         (*  Check for division by zero. *)
         | _, y when y.IsZero ->
@@ -481,11 +512,14 @@ type num = Num
 let inline add_num (x : num) (y : num) : num =
     x + y
 
+let inline ( +/ ) (x : num) (y : num) : num =
+    x + y
+
 /// Unary negation.
 let inline minus_num (x : num) : num =
     -x
 
-let inline (-/) (x : num) (y : num) : num =
+let inline ( -/ ) (x : num) (y : num) : num =
     x - y
 
 //
@@ -507,30 +541,9 @@ let inline square_num (x : num) : num =
 let inline div_num (x : num) (y : num) : num =
     x / y
 
-// NOTE : This is the standard integer division operator.
-// E.g., (Int 20) / (Int 4) = Int 5 and (Int 20) / (Int 3) = Int 6.
-// However, we need to determine how the cases with Ratio
-// are implemented.
-let quo_num (x : num) (y : num) : num =
-    match x, y with
-    | Int x, Int y ->
-        Int (x / y)
-    | Int x, Big_int y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Int x, Ratio y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Big_int x, Int y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Big_int x, Big_int y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Big_int x, Ratio y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Ratio x, Int y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Ratio x, Big_int y ->
-        raise <| System.NotImplementedException "quo_num"
-    | Ratio x, Ratio y ->
-        raise <| System.NotImplementedException "quo_num"
+//
+let inline quo_num (x : num) (y : num) : num =
+    Num.Quotient (x, y)
 
 //
 let inline mod_num (x : num) (y : num) : num =
