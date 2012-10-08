@@ -40,6 +40,7 @@
     <None Include="packages.config" />
     <None Include="app.config" />
     <Compile Include="Num.fs" />
+    <Compile Include="Array.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.PowerPack, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a19089b1c74d0809" />
