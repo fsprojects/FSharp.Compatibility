@@ -50,8 +50,10 @@ _ReSharper*/
 #Subversion files
 .svn
 
-#NuGet packages
-[Pp]ackages
+# NuGet
+!.nuget/*
+[Pp]ackages/*
+![Pp]ackages/repositories.config
 
 # Office Temp Files
 ~$*
@@ -61,5 +63,3 @@ _ReSharper*/
 
 # Installer cache files
 Installers/*-cache/
-
-/Build/BuildInfo.fs
