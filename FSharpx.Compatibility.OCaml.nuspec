@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>FSharpx.Compatibility.OCaml</id>
+        <version>0.1.1</version>
+        <title>OCaml Compatibility Library for F#</title>
+        <authors>Jack Pappas</authors>
+        <owners />
+        <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/jack-pappas/FSharpx.Compatibility.OCaml</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A re-implementation of the OCaml standard library in F# to ease porting and promote cross-compatibility.</description>
+        <tags>fsharp,ocaml</tags>
+    </metadata>
+    <files>
+        <file src="FSharpx.Compatibility.OCaml\bin\Release\FSharp.Compatibility.OCaml.XML" target="lib\net40\FSharp.Compatibility.OCaml.XML" />
+        <file src="FSharpx.Compatibility.OCaml\bin\Release\FSharpx.Compatibility.OCaml.dll" target="lib\net40\FSharpx.Compatibility.OCaml.dll" />
+    </files>
+</package>
