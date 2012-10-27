@@ -1,10 +1,15 @@
 ﻿(*  OCaml Compatibility Library for F#
-    (FSharpx.Compatibility.OCaml)
+    (FSharpx.Compatibility.OCaml.Format)
 
-    Copyright © 2012 Jack Pappas (github.com/jack-pappas)
+    Copyright (c) 1996  Institut National de Recherche en 
+                        Informatique et en Automatique
+    Copyright (c) 2012  Jack Pappas (github.com/jack-pappas)
 
-    This code is available under the GNU Lesser
-    General Public License (LGPL) v2. *)
+    This code is available under the
+    GNU Lesser General Public License (LGPL) v2. *)
+
+// References:
+// http://caml.inria.fr/pub/docs/manual-ocaml/libref/Format.html
 
 /// A pretty-printing facility and definition of formatters for ``parallel''
 /// (i.e. unrelated or independent) pretty-printing on multiple out channels.
@@ -20,7 +25,7 @@ module FSharpx.Compatibility.OCaml.Format
 // TODO : Recreate 'size' as a measure type on int
 type size = int
 let inline size_of_int (n : int) : size = n
-let inline int_of_size (s : size) : int = n
+let inline int_of_size (s : size) : int = s
 
 (* Tokens are one of the following : *)
 
@@ -205,20 +210,20 @@ let add_queue x q =
 exception Empty_queue
 
 let peek_queue = function
-  | { body = Cons { head = x; tail = _; }; _ } -> x
-  | { body = Nil; insert = _; } -> raise Empty_queue
+  | { body = Cons { head = x; tail = _; }; } -> x
+  | { body = Nil; } -> raise Empty_queue
 
 
 let take_queue = function
-  | { body = Cons { head = x; tail = tl; }; _ } as q ->
+  | { body = Cons { head = x; tail = tl; }; } as q ->
     q.body <- tl;
     if tl = Nil then q.insert <- Nil; (* Maintain the invariant. *)
     x
-  | { body = Nil; insert = _; } -> raise Empty_queue
+  | { body = Nil; } -> raise Empty_queue
 
 
 (* Enter a token in the pretty-printer queue. *)
-let pp_enqueue state ({ length = len; _} as token) =
+let pp_enqueue state ({ length = len; } as token) =
   state.pp_right_total <- state.pp_right_total + len;
   add_queue token state.pp_queue
 
@@ -252,7 +257,7 @@ let pp_clear_queue state =
 let pp_infinity = 1000000010
 
 (* Output functions for the formatter. *)
-let pp_output_string state s = state.pp_output_function s 0 (String.length s)
+let rec pp_output_string state s = state.pp_output_function s 0 (String.length s)
 and pp_output_newline state = state.pp_output_newline ()
 and pp_display_blanks state n = state.pp_output_spaces n
 
@@ -384,7 +389,7 @@ let format_pp_token state size = function
     end
 
   | Pp_if_newline ->
-    if state.pp_current_indent != state.pp_margin - state.pp_space_left
+    if state.pp_current_indent <> state.pp_margin - state.pp_space_left
     then pp_skip_token state
 
   | Pp_break (n, off) ->
@@ -495,24 +500,26 @@ let set_size state ty =
     let size = int_of_size size in
     (* test if scan stack contains any data that is not obsolete. *)
     if left_tot < state.pp_left_total then clear_scan_stack state else
-      begin match tok with
-      | Pp_break (_, _) | Pp_tbreak (_, _) ->
+      match tok with
+      | Pp_break (_, _)
+      | Pp_tbreak (_, _) ->
         if ty then
-        begin
           queue_elem.elem_size <- size_of_int (state.pp_right_total + size);
           state.pp_scan_stack <- t
-        end
       | Pp_begin (_, _) ->
         if not ty then
-        begin
           queue_elem.elem_size <- size_of_int (state.pp_right_total + size);
           state.pp_scan_stack <- t
-        end
-      | Pp_text _ | Pp_stab | Pp_tbegin _ | Pp_tend | Pp_end
-      | Pp_newline | Pp_if_newline
-      | Pp_open_tag _ | Pp_close_tag ->
+      | Pp_text _
+      | Pp_stab
+      | Pp_tbegin _
+      | Pp_tend
+      | Pp_end
+      | Pp_newline
+      | Pp_if_newline
+      | Pp_open_tag _
+      | Pp_close_tag ->
         () (* scan_push is only used for breaks and boxes. *)
-      end
   | [] -> () (* scan_stack is never empty. *)
 
 
@@ -545,25 +552,20 @@ let pp_open_sys_box state = pp_open_box_gen state 0 Pp_hovbox
 
 (* Close a block, setting sizes of its sub blocks. *)
 let pp_close_box state () =
-  if state.pp_curr_depth > 1 then
-  begin
-    if state.pp_curr_depth < state.pp_max_boxes then
-    begin
-      pp_enqueue state
-        { elem_size = size_of_int 0; token = Pp_end; length = 0; };
-      set_size state true; set_size state false
-    end;
-    state.pp_curr_depth <- state.pp_curr_depth - 1;
-  end
+    if state.pp_curr_depth > 1 then
+        if state.pp_curr_depth < state.pp_max_boxes then
+            pp_enqueue state {
+                elem_size = size_of_int 0; token = Pp_end; length = 0; }
+            set_size state true
+            set_size state false
+        state.pp_curr_depth <- state.pp_curr_depth - 1
 
 
 (* Open a tag, pushing it on the tag stack. *)
 let pp_open_tag state tag_name =
   if state.pp_print_tags then
-  begin
     state.pp_tag_stack <- tag_name :: state.pp_tag_stack;
     state.pp_print_open_tag tag_name
-  end;
   if state.pp_mark_tags then
     pp_enqueue state {
       elem_size = size_of_int 0;
@@ -615,26 +617,25 @@ let pp_set_formatter_tag_functions
 
 (* Initialize pretty-printer. *)
 let pp_rinit state =
-  pp_clear_queue state;
-  clear_scan_stack state;
-  state.pp_format_stack <- [];
-  state.pp_tbox_stack <- [];
-  state.pp_tag_stack <- [];
-  state.pp_mark_stack <- [];
-  state.pp_current_indent <- 0;
-  state.pp_curr_depth <- 0;
-  state.pp_space_left <- state.pp_margin;
-  pp_open_sys_box state
+    pp_clear_queue state;
+    clear_scan_stack state;
+    state.pp_format_stack <- [];
+    state.pp_tbox_stack <- [];
+    state.pp_tag_stack <- [];
+    state.pp_mark_stack <- [];
+    state.pp_current_indent <- 0;
+    state.pp_curr_depth <- 0;
+    state.pp_space_left <- state.pp_margin;
+    pp_open_sys_box state
 
 (* Flushing pretty-printer queue. *)
 let pp_flush_queue state b =
-  while state.pp_curr_depth > 1 do
-    pp_close_box state ()
-  done;
-  state.pp_right_total <- pp_infinity;
-  advance_left state;
-  if b then pp_output_newline state;
-  pp_rinit state
+    while state.pp_curr_depth > 1 do
+        pp_close_box state ()
+    state.pp_right_total <- pp_infinity;
+    advance_left state;
+    if b then pp_output_newline state;
+    pp_rinit state
 
 
 (**************************************************************
@@ -645,16 +646,16 @@ let pp_flush_queue state b =
 
 (* To format a string. *)
 let pp_print_as_size state size s =
-  if state.pp_curr_depth < state.pp_max_boxes
-  then enqueue_string_as state size s
+    if state.pp_curr_depth < state.pp_max_boxes
+    then enqueue_string_as state size s
 
 
 let pp_print_as state isize s =
-  pp_print_as_size state (size_of_int isize) s
+    pp_print_as_size state (size_of_int isize) s
 
 
 let pp_print_string state s =
-  pp_print_as state (String.length s) s
+    pp_print_as state (String.length s) s
 
 
 (* To format an integer. *)
@@ -668,8 +669,8 @@ let pp_print_bool state b = pp_print_string state (string_of_bool b)
 
 (* To format a char. *)
 let pp_print_char state (c : char) =
-  let s = string c
-  pp_print_as state 1 s
+    let s = string c
+    pp_print_as state 1 s
 
 
 (* Opening boxes. *)
@@ -683,22 +684,22 @@ and pp_open_box state indent = pp_open_box_gen state indent Pp_box
 (* Print a new line after printing all queued text
    (same for print_flush but without a newline). *)
 let rec pp_print_newline state () =
-  pp_flush_queue state true
-  state.pp_flush_function ()
+    pp_flush_queue state true
+    state.pp_flush_function ()
 and pp_print_flush state () =
-  pp_flush_queue state false
-  state.pp_flush_function ()
+    pp_flush_queue state false
+    state.pp_flush_function ()
 
 (* To get a newline when one does not want to close the current block. *)
 let pp_force_newline state () =
-  if state.pp_curr_depth < state.pp_max_boxes then
-    enqueue_advance state (make_queue_elem (size_of_int 0) Pp_newline 0)
+    if state.pp_curr_depth < state.pp_max_boxes then
+        enqueue_advance state (make_queue_elem (size_of_int 0) Pp_newline 0)
 
 
 (* To format something if the line has just been broken. *)
 let pp_print_if_newline state () =
-  if state.pp_curr_depth < state.pp_max_boxes then
-    enqueue_advance state (make_queue_elem (size_of_int 0) Pp_if_newline 0)
+    if state.pp_curr_depth < state.pp_max_boxes then
+        enqueue_advance state (make_queue_elem (size_of_int 0) Pp_if_newline 0)
 
 
 (* Breaks: indicate where a block may be broken.
@@ -706,13 +707,13 @@ let pp_print_if_newline state () =
    block else (the value of) width blanks are printed.
    To do (?) : add a maximum width and offset value. *)
 let pp_print_break state width offset =
-  if state.pp_curr_depth < state.pp_max_boxes then
-    let elem =
-      make_queue_elem
-        (size_of_int (- state.pp_right_total))
-        (Pp_break (width, offset))
-        width
-    scan_push state true elem
+    if state.pp_curr_depth < state.pp_max_boxes then
+        let elem =
+              make_queue_elem
+                (size_of_int (- state.pp_right_total))
+                (Pp_break (width, offset))
+                width
+        scan_push state true elem
 
 
 let rec pp_print_space state () = pp_print_break state 1 0
@@ -729,11 +730,11 @@ let pp_open_tbox state () =
 
 (* Close a tabulation block. *)
 let pp_close_tbox state () =
-  if state.pp_curr_depth > 1 then
-   if state.pp_curr_depth < state.pp_max_boxes then
-     let elem = make_queue_elem (size_of_int 0) Pp_tend 0
-     enqueue_advance state elem;
-     state.pp_curr_depth <- state.pp_curr_depth - 1
+    if state.pp_curr_depth > 1 then
+        if state.pp_curr_depth < state.pp_max_boxes then
+             let elem = make_queue_elem (size_of_int 0) Pp_tend 0
+             enqueue_advance state elem;
+             state.pp_curr_depth <- state.pp_curr_depth - 1
 
 
 (* Print a tabulation break. *)
@@ -750,10 +751,10 @@ let pp_print_tbreak state width offset =
 let pp_print_tab state () = pp_print_tbreak state 0 0
 
 let pp_set_tab state () =
-  if state.pp_curr_depth < state.pp_max_boxes then
-    let elem =
-      make_queue_elem (size_of_int 0) Pp_stab 0
-    enqueue_advance state elem
+    if state.pp_curr_depth < state.pp_max_boxes then
+        let elem =
+            make_queue_elem (size_of_int 0) Pp_stab 0
+        enqueue_advance state elem
 
 
 (**************************************************************
@@ -778,59 +779,61 @@ and pp_get_ellipsis_text state () = state.pp_ellipsis
 
 (* To set the margin of pretty-printer. *)
 let pp_limit n =
-  if n < pp_infinity then n else pred pp_infinity
+    if n < pp_infinity then n else pred pp_infinity
 
 
 let pp_set_min_space_left state n =
-  if n >= 1 then
-    let n = pp_limit n in
-    state.pp_min_space_left <- n;
-    state.pp_max_indent <- state.pp_margin - state.pp_min_space_left;
-    pp_rinit state
+    if n >= 1 then
+        let n = pp_limit n
+        state.pp_min_space_left <- n
+        state.pp_max_indent <- state.pp_margin - state.pp_min_space_left
+        pp_rinit state
 
 
 (* Initially, we have :
   pp_max_indent = pp_margin - pp_min_space_left, and
   pp_space_left = pp_margin. *)
 let pp_set_max_indent state n =
-  pp_set_min_space_left state (state.pp_margin - n)
+    pp_set_min_space_left state (state.pp_margin - n)
 
 let pp_get_max_indent state () = state.pp_max_indent
 
 let pp_set_margin state n =
-  if n >= 1 then
-    let n = pp_limit n in
-    state.pp_margin <- n;
-    let new_max_indent =
-      (* Try to maintain max_indent to its actual value. *)
-      if state.pp_max_indent <= state.pp_margin
-      then state.pp_max_indent else
-      (* If possible maintain pp_min_space_left to its actual value,
-         if this leads to a too small max_indent, take half of the
-         new margin, if it is greater than 1. *)
-       max (max (state.pp_margin - state.pp_min_space_left)
-                (state.pp_margin / 2)) 1 in
-    (* Rebuild invariants. *)
-    pp_set_max_indent state new_max_indent
+    if n >= 1 then
+        let n = pp_limit n
+        state.pp_margin <- n
+        let new_max_indent =
+          (* Try to maintain max_indent to its actual value. *)
+          if state.pp_max_indent <= state.pp_margin
+          then state.pp_max_indent else
+          (* If possible maintain pp_min_space_left to its actual value,
+             if this leads to a too small max_indent, take half of the
+             new margin, if it is greater than 1. *)
+           max (max (state.pp_margin - state.pp_min_space_left)
+                    (state.pp_margin / 2)) 1
+        (* Rebuild invariants. *)
+        pp_set_max_indent state new_max_indent
 
 
 let pp_get_margin state () = state.pp_margin
 
 let pp_set_formatter_output_functions state f g =
-  state.pp_output_function <- f; state.pp_flush_function <- g
+    state.pp_output_function <- f
+    state.pp_flush_function <- g
+
 let pp_get_formatter_output_functions state () =
-  (state.pp_output_function, state.pp_flush_function)
+    (state.pp_output_function, state.pp_flush_function)
 
 
-let pp_set_all_formatter_output_functions state
-    ~out:f ~flush:g ~newline:h ~spaces:i =
-  pp_set_formatter_output_functions state f g;
-  state.pp_output_newline <- h;
-  state.pp_output_spaces <- i;
+//let pp_set_all_formatter_output_functions state ~out:f ~flush:g ~newline:h ~spaces:i =
+let pp_set_all_formatter_output_functions state f g h i =
+    pp_set_formatter_output_functions state f g
+    state.pp_output_newline <- h
+    state.pp_output_spaces <- i
 
 let pp_get_all_formatter_output_functions state () =
-  (state.pp_output_function, state.pp_flush_function,
-   state.pp_output_newline, state.pp_output_spaces)
+    (state.pp_output_function, state.pp_flush_function,
+     state.pp_output_newline, state.pp_output_spaces)
 
 
 (* Default function to output new lines. *)
@@ -839,18 +842,24 @@ let display_newline state () = state.pp_output_function "\n" 0  1
 (* Default function to output spaces. *)
 let blank_line = String.make 80 ' '
 let rec display_blanks state n =
-  if n > 0 then
-      if n <= 80 then state.pp_output_function blank_line 0 n
-      else
-        state.pp_output_function blank_line 0 80;
-        display_blanks state (n - 80)
+    if n > 0 then
+        if n <= 80 then
+            state.pp_output_function blank_line 0 n
+        else
+            state.pp_output_function blank_line 0 80
+            display_blanks state (n - 80)
 
+
+/// Re-implementation of OCaml's Pervasives.output, since the one in the
+/// F# compatibility library doesn't have the right type signature.
+let output oc (buf : string) (pos : int) (len : int) =
+    output_string oc (buf.Substring (pos, len))
 
 let pp_set_formatter_out_channel state os =
-  state.pp_output_function <- output os;
-  state.pp_flush_function <- (fun () -> flush os);
-  state.pp_output_newline <- display_newline state;
-  state.pp_output_spaces <- display_blanks state;
+    state.pp_output_function <- output os
+    state.pp_flush_function <- (fun () -> flush os)
+    state.pp_output_newline <- display_newline state
+    state.pp_output_spaces <- display_blanks state
 
 
 (**************************************************************
@@ -866,73 +875,73 @@ let default_pp_print_open_tag _ = ()
 let default_pp_print_close_tag = default_pp_print_open_tag
 
 let pp_make_formatter f g h i =
-  (* The initial state of the formatter contains a dummy box. *)
-  let pp_q = make_queue () in
-  let sys_tok =
-    make_queue_elem (size_of_int (-1)) (Pp_begin (0, Pp_hovbox)) 0 in
-  add_queue sys_tok pp_q;
-  let sys_scan_stack =
-      (Scan_elem (1, sys_tok)) :: scan_stack_bottom in
-  {
-   pp_scan_stack = sys_scan_stack;
-   pp_format_stack = [];
-   pp_tbox_stack = [];
-   pp_tag_stack = [];
-   pp_mark_stack = [];
-   pp_margin = 78;
-   pp_min_space_left = 10;
-   pp_max_indent = 78 - 10;
-   pp_space_left = 78;
-   pp_current_indent = 0;
-   pp_is_new_line = true;
-   pp_left_total = 1;
-   pp_right_total = 1;
-   pp_curr_depth = 1;
-   pp_max_boxes = max_int;
-   pp_ellipsis = ".";
-   pp_output_function = f;
-   pp_flush_function = g;
-   pp_output_newline = h;
-   pp_output_spaces = i;
-   pp_print_tags = false;
-   pp_mark_tags = false;
-   pp_mark_open_tag = default_pp_mark_open_tag;
-   pp_mark_close_tag = default_pp_mark_close_tag;
-   pp_print_open_tag = default_pp_print_open_tag;
-   pp_print_close_tag = default_pp_print_close_tag;
-   pp_queue = pp_q;
-  }
+    (* The initial state of the formatter contains a dummy box. *)
+    let pp_q = make_queue ()
+    let sys_tok =
+        make_queue_elem (size_of_int (-1)) (Pp_begin (0, Pp_hovbox)) 0
+    add_queue sys_tok pp_q;
+    let sys_scan_stack =
+        (Scan_elem (1, sys_tok)) :: scan_stack_bottom
+    {
+           pp_scan_stack = sys_scan_stack;
+           pp_format_stack = [];
+           pp_tbox_stack = [];
+           pp_tag_stack = [];
+           pp_mark_stack = [];
+           pp_margin = 78;
+           pp_min_space_left = 10;
+           pp_max_indent = 78 - 10;
+           pp_space_left = 78;
+           pp_current_indent = 0;
+           pp_is_new_line = true;
+           pp_left_total = 1;
+           pp_right_total = 1;
+           pp_curr_depth = 1;
+           pp_max_boxes = max_int;
+           pp_ellipsis = ".";
+           pp_output_function = f;
+           pp_flush_function = g;
+           pp_output_newline = h;
+           pp_output_spaces = i;
+           pp_print_tags = false;
+           pp_mark_tags = false;
+           pp_mark_open_tag = default_pp_mark_open_tag;
+           pp_mark_close_tag = default_pp_mark_close_tag;
+           pp_print_open_tag = default_pp_print_open_tag;
+           pp_print_close_tag = default_pp_print_close_tag;
+           pp_queue = pp_q;
+    }
 
 
 (* Make a formatter with default functions to output spaces and new lines. *)
 let make_formatter output flush =
-  let ppf = pp_make_formatter output flush ignore ignore in
-  ppf.pp_output_newline <- display_newline ppf;
-  ppf.pp_output_spaces <- display_blanks ppf;
-  ppf
+    let ppf = pp_make_formatter output flush ignore ignore
+    ppf.pp_output_newline <- display_newline ppf
+    ppf.pp_output_spaces <- display_blanks ppf
+    ppf
 
 
 let formatter_of_out_channel oc =
-  make_formatter (output oc) (fun () -> flush oc)
+    make_formatter (output oc) (fun () -> flush oc)
 
 
 let formatter_of_buffer b =
-  make_formatter (Buffer.add_substring b) ignore
+    make_formatter (Buffer.add_substring b) ignore
 
 
 let stdbuf = Buffer.create 512
 
 (* Predefined formatters. *)
-let rec std_formatter = formatter_of_out_channel Pervasives.stdout
-and err_formatter = formatter_of_out_channel Pervasives.stderr
+let rec std_formatter = formatter_of_out_channel stdout
+and err_formatter = formatter_of_out_channel stderr
 and str_formatter = formatter_of_buffer stdbuf
 
 
 let flush_str_formatter () =
-  pp_flush_queue str_formatter false;
-  let s = Buffer.contents stdbuf in
-  Buffer.reset stdbuf;
-  s
+    pp_flush_queue str_formatter false
+    let s = Buffer.contents stdbuf
+    Buffer.reset stdbuf
+    s
 
 
 (**************************************************************
@@ -983,33 +992,33 @@ and over_max_boxes = pp_over_max_boxes std_formatter
 and set_ellipsis_text = pp_set_ellipsis_text std_formatter
 and get_ellipsis_text = pp_get_ellipsis_text std_formatter
 
-and set_formatter_out_channel =
-  pp_set_formatter_out_channel std_formatter
+and set_formatter_out_channel (channel : out_channel) =
+    pp_set_formatter_out_channel std_formatter channel
 
 and set_formatter_output_functions =
-  pp_set_formatter_output_functions std_formatter
+    pp_set_formatter_output_functions std_formatter
 and get_formatter_output_functions =
-  pp_get_formatter_output_functions std_formatter
+    pp_get_formatter_output_functions std_formatter
 
 and set_all_formatter_output_functions =
-  pp_set_all_formatter_output_functions std_formatter
+    pp_set_all_formatter_output_functions std_formatter
 and get_all_formatter_output_functions =
-  pp_get_all_formatter_output_functions std_formatter
+    pp_get_all_formatter_output_functions std_formatter
 
 and set_formatter_tag_functions =
-  pp_set_formatter_tag_functions std_formatter
+    pp_set_formatter_tag_functions std_formatter
 and get_formatter_tag_functions =
-  pp_get_formatter_tag_functions std_formatter
+    pp_get_formatter_tag_functions std_formatter
 and set_print_tags =
-  pp_set_print_tags std_formatter
+    pp_set_print_tags std_formatter
 and get_print_tags =
-  pp_get_print_tags std_formatter
+    pp_get_print_tags std_formatter
 and set_mark_tags =
-  pp_set_mark_tags std_formatter
+    pp_set_mark_tags std_formatter
 and get_mark_tags =
-  pp_get_mark_tags std_formatter
+    pp_get_mark_tags std_formatter
 and set_tags =
-  pp_set_tags std_formatter
+    pp_set_tags std_formatter
 
 
 
@@ -1019,19 +1028,18 @@ and set_tags =
 
  **************************************************************)
 
-module Sformat = Printf.CamlinternalPr.Sformat
+module Sformat = Printf.Sformat
 module Tformat = Printf.CamlinternalPr.Tformat
 
 (* Error messages when processing formats. *)
 
 (* Trailer: giving up at character number ... *)
 let giving_up mess fmt i =
-  Printf.sprintf
-    "Format.fprintf: %s ``%s'', giving up at character number %d%s"
+  sprintf "Format.fprintf: %s ``%s'', giving up at character number %d%s"
     mess (Sformat.to_string fmt) i
     (if i < Sformat.length fmt
-     then Printf.sprintf " (%c)." (Sformat.get fmt i)
-     else Printf.sprintf "%c" '.')
+     then sprintf " (%c)." (Sformat.get fmt i)
+     else sprintf "%c" '.')
 
 
 (* When an invalid format deserves a special error explanation. *)
@@ -1042,19 +1050,19 @@ let invalid_format fmt i = format_invalid_arg "bad format" fmt i
 
 (* Cannot find a valid integer into that format. *)
 let invalid_integer fmt i =
-  invalid_arg (giving_up "bad integer specification" fmt i)
+    invalid_arg (giving_up "bad integer specification" fmt i)
 
 (* Finding an integer size out of a sub-string of the format. *)
 let format_int_of_string fmt i s =
-  let sz =
-    try int_of_string s with
-    | Failure _ -> invalid_integer fmt i in
-  size_of_int sz
+    let sz =
+        try int_of_string s with
+        | Failure _ -> invalid_integer fmt i
+    size_of_int sz
 
 
 (* Getting strings out of buffers. *)
 let get_buffer_out b =
-  let s = Buffer.contents b in
+  let s = Buffer.contents b
   Buffer.reset b;
   s
 
@@ -1063,16 +1071,16 @@ let get_buffer_out b =
    to extract the contents of [ppf] as a string we flush [ppf] and get the
    string out of [b]. *)
 let string_out b ppf =
-  pp_flush_queue ppf false;
+  pp_flush_queue ppf false
   get_buffer_out b
 
 
 (* Applies [printer] to a formatter that outputs on a fresh buffer,
    then returns the resulting material. *)
 let exstring printer arg =
-  let b = Buffer.create 512 in
-  let ppf = formatter_of_buffer b in
-  printer ppf arg;
+  let b = Buffer.create 512
+  let ppf = formatter_of_buffer b
+  printer ppf arg
   string_out b ppf
 
 
@@ -1198,7 +1206,10 @@ let mkprintf to_s get_out =
           let rec get j =
             if j >= len then invalid_integer fmt j else
             match Sformat.get fmt j with
-            | '0' .. '9' | '-' -> get (succ j)
+            | x when x >= '0' && x <= '9' ->
+                get (succ j)
+            | '-' ->
+                get (succ j)
             | _ ->
               let size =
                 if j = i then size_of_int 0 else
@@ -1311,7 +1322,7 @@ let mkprintf to_s get_out =
     Tformat.kapr kpr fmt in
 
   kprintf
-
+ 
 
 (**************************************************************
 
@@ -1328,12 +1339,12 @@ let printf fmt = fprintf std_formatter fmt
 let eprintf fmt = fprintf err_formatter fmt
 
 let ksprintf k =
-  let b = Buffer.create 512 in
-  let k ppf = k (string_out b ppf) in
-  mkprintf true (fun _ -> formatter_of_buffer b) k
+    let b = Buffer.create 512
+    let k ppf = k (string_out b ppf)
+    mkprintf true (fun _ -> formatter_of_buffer b) k
 
 
-let sprintf fmt = ksprintf (fun s -> s) fmt
+let sprintf fmt = ksprintf id fmt
 
 (**************************************************************
 
@@ -1342,13 +1353,13 @@ let sprintf fmt = ksprintf (fun s -> s) fmt
  **************************************************************)
 
 let kbprintf k b =
-  mkprintf false (fun _ -> formatter_of_buffer b) k
+    mkprintf false (fun _ -> formatter_of_buffer b) k
 
 
 (* Deprecated error prone function bprintf. *)
 let bprintf b =
-  let k ppf = pp_flush_queue ppf false in
-  kbprintf k b
+    let k ppf = pp_flush_queue ppf false
+    kbprintf k b
 
 
 (* Deprecated alias for ksprintf. *)
