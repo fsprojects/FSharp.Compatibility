@@ -13,7 +13,7 @@
         <tags>fsharp,ocaml</tags>
     </metadata>
     <files>
-        <file src="..\FSharpx.Compatibility.OCaml\bin\Release\FSharp.Compatibility.OCaml.XML" target="lib\net40\FSharp.Compatibility.OCaml.XML" />
+        <file src="..\FSharpx.Compatibility.OCaml\bin\Release\FSharpx.Compatibility.OCaml.XML" target="lib\net40\FSharpx.Compatibility.OCaml.XML" />
         <file src="..\FSharpx.Compatibility.OCaml\bin\Release\FSharpx.Compatibility.OCaml.dll" target="lib\net40\FSharpx.Compatibility.OCaml.dll" />
     </files>
 </package>
