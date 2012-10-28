@@ -1,12 +1,12 @@
 (*  OCaml Compatibility Library for F#
     (FSharpx.Compatibility.OCaml)
 
-    Copyright © 2012 Jack Pappas (github.com/jack-pappas)
+    Copyright (c) Microsoft Corporation 2005-2009
+    Copyright (c) Jack Pappas 2012
+        http://github.com/jack-pappas
 
-    This code is available under the Apache 2.0 license.
-    See the LICENSE file for the complete text of the license. *)
-
-(* NOTE :   This file must be the last file in the F# project's build order. *)
+    This code is distributed under the terms of the Apache 2.0 license.
+    See the LICENSE file for details. *)
 
 /// Defines assembly-level attributes common to all projects in the solution.
 module internal CommonAssemblyInfo

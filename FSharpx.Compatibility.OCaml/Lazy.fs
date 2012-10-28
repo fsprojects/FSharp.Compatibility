@@ -9,6 +9,10 @@
     See the LICENSE file for details. *)
 
 //
+[<CompilerMessage(
+    "This module is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Lazy
 

@@ -9,8 +9,25 @@
     See the LICENSE file for details. *)
 
 //
+[<CompilerMessage(
+    "This module is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Seq
 
+open System.Collections.Generic
 
+
+//
+let generate openf compute closef =
+    seq {
+    let r = openf ()
+    try
+        let x = ref None
+        while (x := compute r; (!x).IsSome) do
+            yield (!x).Value
+    finally
+        closef r }
 

@@ -1,13 +1,36 @@
 ﻿(*  OCaml Compatibility Library for F#
     (FSharpx.Compatibility.OCaml)
 
-    Copyright (c) 2012 Jack Pappas (github.com/jack-pappas)
+    Copyright (c) Microsoft Corporation 2005-2009
+    Copyright (c) Jack Pappas 2012
+        http://github.com/jack-pappas
 
-    This code is available under the Apache 2.0 license.
-    See the LICENSE file for the complete text of the license. *)
+    This code is distributed under the terms of the Apache 2.0 license.
+    See the LICENSE file for details. *)
 
 module internal AssemblyInfo
 
+open System
+open System.Reflection
+open System.Runtime.CompilerServices
+open System.Runtime.InteropServices
+open System.Security.Permissions
+
+
 [<assembly: AutoOpen("FSharpx.Compatibility.OCaml")>]
+[<assembly: CLSCompliant(true)>]
+
+#if FX_NO_SECURITY_PERMISSIONS
+#else
+#if FX_SIMPLE_SECURITY_PERMISSIONS
+[<assembly: SecurityPermission(SecurityAction.RequestMinimum)>]
+#else
+#endif
+#endif
+
+#if FX_NO_DEFAULT_DEPENDENCY_TYPE
+#else
+[<assembly: Dependency("FSharp.Core", LoadHint.Always)>] 
+#endif
 
 do ()

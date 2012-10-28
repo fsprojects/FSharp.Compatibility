@@ -16,6 +16,10 @@
 /// <summary>Operation on arbitrary-precision numbers.</summary>
 /// <remarks>Numbers (type num) are arbitrary-precision rational numbers, plus the
 /// special elements 1/0 (infinity) and 0/0 (undefined).</remarks>
+[<CompilerMessage(
+    "This module is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Num
 

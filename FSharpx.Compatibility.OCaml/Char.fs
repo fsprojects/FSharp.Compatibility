@@ -12,6 +12,11 @@
 // http://caml.inria.fr/pub/docs/manual-ocaml/libref/Char.html
 
 /// Character operations.
+[<CompilerMessage(
+    "This module is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Char
 
 open System
