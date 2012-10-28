@@ -13,6 +13,7 @@
 
 //
 [<AutoOpen>]
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Pervasives
 
 open System

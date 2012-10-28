@@ -36,9 +36,31 @@
   <ItemGroup>
     <Compile Include="Core.fs" />
     <Compile Include="Pervasives.fs" />
-    <Compile Include="String.fs" />
+    <Compile Include="Obj.fs" />
+    <Compile Include="Byte.fs" />
+    <Compile Include="Float.fs" />
+    <Compile Include="Int16.fs" />
+    <Compile Include="Int32.fs" />
+    <Compile Include="Int64.fs" />
+    <Compile Include="SByte.fs" />
+    <Compile Include="UInt32.fs" />
+    <Compile Include="UInt64.fs" />
     <Compile Include="Char.fs" />
     <Compile Include="Array.fs" />
+    <Compile Include="Array2D.fs" />
+    <Compile Include="String.fs" />
+    <Compile Include="List.fs" />
+    <Compile Include="Seq.fs" />
+    <Compile Include="Map.fs" />
+    <Compile Include="Set.fs" />
+    <Compile Include="Hashtbl.fs" />
+    <Compile Include="Buffer.fs" />
+    <Compile Include="Lazy.fs" />
+    <Compile Include="Printexc.fs" />
+    <Compile Include="Filename.fs" />
+    <Compile Include="Arg.fs" />
+    <Compile Include="Lexing.fs" />
+    <Compile Include="Parsing.fs" />    
     <Compile Include="Num.fs" />
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>

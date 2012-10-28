@@ -13,6 +13,7 @@
 
 /// Built-in types and predefined exceptions.
 [<AutoOpen>]
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Core
 
 open System
