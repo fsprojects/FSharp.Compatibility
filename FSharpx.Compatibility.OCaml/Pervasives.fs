@@ -34,7 +34,17 @@ type fpclass =
 /// Return the class of the given floating-point number:
 /// normal, subnormal, zero, infinite, or not a number.
 let classify_float (value : float) : fpclass =
-    raise <| System.NotImplementedException "classify_float"
+    if value = 0.0 || value = -0.0 then
+        FP_zero
+    elif Double.IsNaN value then
+        FP_nan
+    elif Double.IsInfinity value then
+        FP_infinite
+    else
+        // TODO : Subnormals need to be handled, but there is no
+        // built-in .NET function for this so we'll have to implement something.
+        raise <| System.NotImplementedException "classify_float"
+        FP_normal
 
 
 (*** Operations on format strings ***)
