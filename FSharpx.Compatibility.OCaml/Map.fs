@@ -18,7 +18,6 @@ module FSharpx.Compatibility.OCaml.Map
 
 open System.Collections.Generic
 
-(*
 
 type TaggedMap<'Key,'Value,'Tag when 'Tag :> IComparer<'Key> > = Microsoft.FSharp.Collections.Tagged.Map<'Key,'Value,'Tag>
 type TaggedMap<'Key,'Value> = Microsoft.FSharp.Collections.Tagged.Map<'Key,'Value>
@@ -54,6 +53,4 @@ let MakeTagged (cf : 'Tag) : Provider<'Key,'Value,'Tag> when 'Tag :> IComparer<'
 
 type Provider<'Key,'Value> = Provider<'Key,'Value,IComparer<'Key>>
 let Make cf  = MakeTagged (ComparisonIdentity.FromFunction cf)
-
-*)
 

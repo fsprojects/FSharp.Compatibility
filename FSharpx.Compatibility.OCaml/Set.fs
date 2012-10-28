@@ -29,8 +29,6 @@ let elements (s : Set<'T>) = Set.toList s
 // let fold f m z = Set.fold_left (fun z x ->  f x z) z m
 let inter s1 s2 = Set.intersect s1 s2
 
-(*
-
 // Functor
 type Provider<'T,'Tag> when 'Tag :> IComparer<'T> =
     interface
@@ -105,6 +103,4 @@ let MakeTagged (cf : 'Tag) : Provider<'T,'Tag> when 'Tag :> IComparer<'T> =
 
 type Provider<'T> = Provider<'T, IComparer<'T>>
 let Make cf  = MakeTagged (ComparisonIdentity.FromFunction cf)
-
-*)
 

@@ -16,7 +16,6 @@
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Arg
 
-(*
 
 let Clear  x = ArgType.Clear x
 let Float  x = ArgType.Float x
@@ -42,5 +41,3 @@ let parse specs other usageText =
 let usage specs usageText = 
     ArgParser.Usage(List.map (fun (a,b,c) -> ArgInfo(a,b,c)) specs, usageText)
 #endif
-
-*)

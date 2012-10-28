@@ -20,7 +20,6 @@ open Microsoft.FSharp.Collections
 open System.Collections.Generic
 open System.IO
 
-(*
 
 type HashTable<'Key,'Val> = HashMultiMap<'Key,'Val> 
 type ('Key,'Val) t = HashMultiMap<'Key,'Val> 
@@ -89,6 +88,4 @@ let MakeTagged (ops : 'Tag) : Provider<'Key,'Val,'Tag> when 'Tag :> IEqualityCom
       member p.fold f c acc = c.Fold f acc; }
 
 let Make (hash,eq) = MakeTagged (HashIdentity.FromFunctions hash eq)
-
-*)
 

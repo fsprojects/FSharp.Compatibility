@@ -16,8 +16,6 @@
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Lexing
 
-(*
-
 open Microsoft.FSharp.Text.Lexing
 open System.IO
 open System.Text
@@ -28,7 +26,6 @@ type lexbuf =  LexBuffer<byte>
 
 let from_function (f: byte[] -> int -> int)  = 
     LexBuffer<byte>.FromByteFunction f
-
 
 let from_text_reader (enc: System.Text.Encoding) (tr: TextReader) =
   LexBuffer<byte>.FromFunction (fun (bytebuf,start,len) ->
@@ -78,6 +75,4 @@ let flush_input (lb: lexbuf) = lb.DiscardInput ()
 let lexbuf_curr_p lb = lexeme_end_p lb
 let lexbuf_set_curr_p (lb:lexbuf) (p : position) = lb.EndPos  <- p
 let lexbuf_set_start_p (lb:lexbuf) (p : position) = lb.StartPos <- p
-
-*)
 
