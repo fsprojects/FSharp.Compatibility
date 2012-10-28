@@ -1,7 +1,21 @@
-# OCaml Compatibility Library for F# #
+## FSharpx.Compatibility
+### Compatibility Libraries for F#
 
-### A re-implementation of the OCaml standard library in F# to ease porting and promote cross-compatibility. ###
+This repository contains library projects which help adapt existing code in other languages to F#.
 
----
 
-More information and documentation coming soon!
+### OCaml
+
+* **FSharpx.Compatibility.OCaml** *(Apache 2.0)*
+  The OCaml Core library and most of the Standard Library.
+
+* **FSharpx.Compatibility.OCaml.Format** *(LGPL v2)*
+  The Format module from the OCaml Standard Library. This is provided as a separate assembly due to licensing concerns; it contains source code from the OCaml Standard Library.
+
+* **FSharpx.Compatibility.OCaml.System** *(Apache 2.0)*
+  Implementations of certain system-related modules from the OCaml Standard Library, such as **Sys** and **Unix**. This is provided as a separate assembly to avoid taking additional dependencies in the **FSharpx.Compatibility.OCaml** project.
+
+
+### License
+
+The projects in this repository are individually licensed. The license for each project is listed next to the project name in the descriptions above; please see the **LICENSE** or **COPYING** files within the project folders for specific license details.
