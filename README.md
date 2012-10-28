@@ -7,7 +7,7 @@ This repository contains library projects which help adapt existing code in othe
 ---
 ### OCaml
 
-* **FSharpx.Compatibility.OCaml** *(Apache 2.0)*
+* **[FSharpx.Compatibility.OCaml](https://nuget.org/packages/FSharpx.Compatibility.OCaml)** *(Apache 2.0)*
 
   The OCaml Core library and most of the Standard Library.
 
