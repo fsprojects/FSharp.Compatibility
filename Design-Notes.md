@@ -1,7 +1,8 @@
-﻿### OCaml Compatibility Library for F# ###
-(FSharpx.Compatibility.OCaml)
+﻿## FSharpx.Compatibility
+### Design/Implementation Notes
 
-## Design / Implementation Notes ##
+
+### FSharpx.Compatibility.OCaml
 
 -	Some modules are already implemented in the F# PowerPack (under the
 	FSharp.PowerPack.Compatibility namespace). However, not all of these modules
@@ -14,17 +15,9 @@
 -	The Thread module should be able to be re-implemented using the
 	System.Threading.Thread type (or the System.Diagnostics.ProcessThread type).
 -	The Str module can be implemented using System.Text.RegularExpression.
--	The Unix, UnixLabels, and ThreadUnix modules can be implemented in a
-	separate library, and built on top of the Mono.Unix / Mono.Posix libraries.
 -	The Nativeint module should be trivial to re-implement using the built-in F#
 	'nativeint' type. Note that most of the functions defined by the OCaml
 	module translate into constants or single IL OpCodes when written in F#.
--	The Sys module can be implemented using System.Environment, System.Diagnostics.Process,
-	System.IO.File, System.IO.Directory.
-	-	The signal-handling functions and constants are only relevant on
-		Unix-based systems, so the re-implemented module should probably go in
-		the separate library that'll also contain the Unix module; this way the
-		signal-handling functions can be implemented using the Mono.Unix library.
 -	The Random module can be implemented using System.Random.
 -	The Digest library can be implemented using System.Security.Cryptography.MD5
 	(preferably MD5Cng, but that requires .NET 3.5 or later, so if we support
@@ -47,6 +40,15 @@
 		liblablgtk-ocaml.
 -	The Stack module is quite simple and could easily be implemented on top of
 	the System.Collections.Generic.Stack type.
--	The Format module needs to be re-implemented from scratch using the documentation
-	available on the OCaml website.
 
+
+### FSharpx.Compatibility.OCaml.System
+
+-	The Unix, UnixLabels, and ThreadUnix modules can be implemented in a
+	separate library, and built on top of the Mono.Unix / Mono.Posix libraries.
+-	The Sys module can be implemented using System.Environment, System.Diagnostics.Process,
+	System.IO.File, System.IO.Directory.
+	-	The signal-handling functions and constants are only relevant on
+		Unix-based systems, so the re-implemented module should probably go in
+		the separate library that'll also contain the Unix module; this way the
+		signal-handling functions can be implemented using the Mono.Unix library.
