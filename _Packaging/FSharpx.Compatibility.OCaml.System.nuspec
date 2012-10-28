@@ -3,6 +3,9 @@
     <metadata>
         <id>FSharpx.Compatibility.OCaml.System</id>
         <version>0.1.3</version>
+        <dependencies>
+            <dependency id="FSharpx.Compatibility.OCaml" version="0.1.3" />
+        </dependencies>
         <title>OCaml Compatibility Library for F# (System programming modules)</title>
         <authors>Jack Pappas</authors>
         <owners />
