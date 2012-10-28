@@ -1,10 +1,12 @@
 ﻿(*  OCaml Compatibility Library for F#
     (FSharpx.Compatibility.OCaml)
 
-    Copyright (c) 2012 Jack Pappas (github.com/jack-pappas)
+    Copyright (c) Microsoft Corporation 2005-2009
+    Copyright (c) Jack Pappas 2012
+        http://github.com/jack-pappas
 
-    This code is available under the Apache 2.0 license.
-    See the LICENSE file for the complete text of the license. *)
+    This code is distributed under the terms of the Apache 2.0 license.
+    See the LICENSE file for details. *)
 
 // References:
 // http://caml.inria.fr/pub/docs/manual-ocaml/libref/String.html

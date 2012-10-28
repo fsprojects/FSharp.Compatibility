@@ -1,12 +1,14 @@
-﻿(*  OCaml Compatibility Library for F#
+﻿(*  OCaml Compatibility Library for F# (Format module)
     (FSharpx.Compatibility.OCaml.Format)
 
     Copyright (c) 1996  Institut National de Recherche en 
                         Informatique et en Automatique
-    Copyright (c) 2012  Jack Pappas (github.com/jack-pappas)
+    Copyright (c) Jack Pappas 2012
+        http://github.com/jack-pappas
 
-    This code is available under the
-    GNU Lesser General Public License (LGPL) v2. *)
+    This code is distributed under the terms of the
+    GNU Lesser General Public License (LGPL) v2.1.
+    See the LICENSE file for details. *)
 
 // References:
 // http://caml.inria.fr/pub/docs/manual-ocaml/libref/Format.html
