@@ -2,6 +2,7 @@
 ### Design/Implementation Notes
 
 
+---
 ### FSharpx.Compatibility.OCaml
 
 -	Some modules are already implemented in the F# PowerPack (under the
@@ -42,6 +43,7 @@
 	the System.Collections.Generic.Stack type.
 
 
+---
 ### FSharpx.Compatibility.OCaml.System
 
 -	The Unix, UnixLabels, and ThreadUnix modules can be implemented in a

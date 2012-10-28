@@ -4,6 +4,7 @@
 This repository contains library projects which help adapt existing code in other languages to F#.
 
 
+---
 ### OCaml
 
 * **FSharpx.Compatibility.OCaml** *(Apache 2.0)*
@@ -19,6 +20,7 @@ This repository contains library projects which help adapt existing code in othe
   Implementations of certain system-related modules from the OCaml Standard Library, such as **Sys** and **Unix**. This is provided as a separate assembly to avoid taking additional dependencies in the **FSharpx.Compatibility.OCaml** project.
 
 
+---
 ### License
 
 The projects in this repository are individually licensed. The license for each project is listed next to the project name in the descriptions above; please see the **LICENSE** or **COPYING** files within the project folders for specific license details.
