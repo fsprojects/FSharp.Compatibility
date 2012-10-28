@@ -7,7 +7,7 @@
         <authors>Jack Pappas</authors>
         <owners />
         <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
-        <projectUrl>https://github.com/jack-pappas/FSharpx.Compatibility.OCaml</projectUrl>
+        <projectUrl>https://github.com/jack-pappas/FSharpx.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A re-implementation of the OCaml standard library in F# to ease porting and promote cross-compatibility.</description>
         <tags>fsharp,ocaml</tags>
