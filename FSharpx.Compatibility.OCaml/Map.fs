@@ -19,10 +19,17 @@ module FSharpx.Compatibility.OCaml.Map
 open System.Collections.Generic
 
 
-type TaggedMap<'Key,'Value,'Tag when 'Tag :> IComparer<'Key> > = Microsoft.FSharp.Collections.Tagged.Map<'Key,'Value,'Tag>
-type TaggedMap<'Key,'Value> = Microsoft.FSharp.Collections.Tagged.Map<'Key,'Value>
+type TaggedMap<'Key, 'Value, 'Tag when 'Tag :> IComparer<'Key>> =
+    Microsoft.FSharp.Collections.Tagged.Map<'Key, 'Value, 'Tag>
+type TaggedMap<'Key, 'Value> =
+    Microsoft.FSharp.Collections.Tagged.Map<'Key, 'Value>
 
-type Provider<'Key,'T,'Tag> when 'Tag :> IComparer<'Key> =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+type Provider<'Key, 'T, 'Tag> when 'Tag :> IComparer<'Key> =
     interface
         abstract empty: TaggedMap<'Key,'T,'Tag>;
         abstract add: 'Key -> 'T -> TaggedMap<'Key,'T,'Tag> -> TaggedMap<'Key,'T,'Tag>;
@@ -37,7 +44,21 @@ type Provider<'Key,'T,'Tag> when 'Tag :> IComparer<'Key> =
         abstract fold: ('Key -> 'T -> 'State -> 'State) -> TaggedMap<'Key,'T,'Tag> -> 'State -> 'State
     end
 
-let MakeTagged (cf : 'Tag) : Provider<'Key,'Value,'Tag> when 'Tag :> IComparer<'Key> =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+type Provider<'Key, 'Value> = Provider<'Key, 'Value, IComparer<'Key>>
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let MakeTagged (cf : 'Tag) : Provider<'Key, 'Value, 'Tag> when 'Tag :> IComparer<'Key> =
+    // OPTIMIZE : Re-implement this as a generalized, static, generic value
+    // so only one instance will be created for each combination of ('Key, 'Value, 'Tag).
     { new Provider<_,_,_> with 
             member p.empty = TaggedMap<_,_,_>.Empty(cf);
             member p.add k v m  = m.Add(k,v);
@@ -51,6 +72,10 @@ let MakeTagged (cf : 'Tag) : Provider<'Key,'Value,'Tag> when 'Tag :> IComparer<'
             member p.mapi f m = m.Map(f)
             member p.fold f m z = m.Fold f z }
 
-type Provider<'Key,'Value> = Provider<'Key,'Value,IComparer<'Key>>
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
 let Make cf  = MakeTagged (ComparisonIdentity.FromFunction cf)
 

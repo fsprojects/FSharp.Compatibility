@@ -39,12 +39,15 @@ let make_matrix (dimx : int) (dimy : int) (e : 'a) : 'a[][] =
 
 //
 [<Obsolete("Deprecated. Use 'make_matrix' instead.")>]
+[<CompilerMessage("This construct is for ML compatibility. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
 let inline create_matrix (dimx : int) (dimy : int) (e : 'a) =
     make_matrix dimx dimy e
 
+[<Obsolete("This function will be removed. Use 'not Array.isEmpty' instead")>]
 let nonempty (arr: _[]) = (arr.Length <> 0)
     
-let inline pinObjUnscoped (obj: obj) =  GCHandle.Alloc(obj,GCHandleType.Pinned) 
+let inline pinObjUnscoped (obj: obj) =
+    GCHandle.Alloc(obj,GCHandleType.Pinned) 
 
 let inline pinObj (obj: obj) f = 
     let gch = pinObjUnscoped obj 
@@ -52,19 +55,26 @@ let inline pinObj (obj: obj) f =
     finally
         gch.Free()
     
+[<Unverifiable>]
 [<NoDynamicInvocation>]
 let inline pin (arr: 'T []) (f : nativeptr<'T> -> 'U) = 
     pinObj (box arr) (fun _ -> f (&&arr.[0]))
     
+[<Unverifiable>]
 [<NoDynamicInvocation>]
 let inline pinUnscoped (arr: 'T []) : nativeptr<'T> * _ = 
     let gch = pinObjUnscoped (box arr) 
     &&arr.[0], gch
 
+[<Unverifiable>]
 [<NoDynamicInvocation>]
-let inline pin_unscoped arr= pinUnscoped arr 
+[<Obsolete("This function has been renamed to 'pinUnscoped'")>]
+let inline pin_unscoped arr = pinUnscoped arr 
       
+
 let inline contains x (arr: 'T []) =
+    // OPTIMIZE : Replace the implementation below with
+    // a simpler call to System.Array.IndexOf
     let mutable found = false
     let mutable i = 0
     let eq = LanguagePrimitives.FastGenericEqualityComparer
@@ -76,7 +86,9 @@ let inline contains x (arr: 'T []) =
             i <- i + 1
     found
 
-let inline mem x arr = contains x arr
+[<CompilerMessage("This construct is for ML compatibility. The F# name for this function is 'contains'. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let inline mem x arr =
+    contains x arr
         
 let scanSubRight f (arr : _[]) start fin initState = 
     let mutable state = initState 
@@ -117,24 +129,51 @@ let createJaggedMatrix (n:int) (m:int) (x:'T) =
 
 //let create_matrix n m x = createJaggedMatrix n m x
 
-let isEmpty array = Array.isEmpty array
+//
+let isEmpty array =
+    Array.isEmpty array
 
-let zero_create n = Array.zeroCreate n 
+//
+let zero_create n =
+    Array.zeroCreate n 
 
-let fold_left f z array = Array.fold f z array
+//
+[<CompilerMessage("This construct is for ML compatibility. This F# library function has been renamed. Use 'fold' instead. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let fold_left f z array =
+    Array.fold f z array
 
-let fold_right f array z = Array.foldBack f array z
+//
+[<CompilerMessage("This construct is for ML compatibility. This F# library function has been renamed. Use 'foldBack' instead. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let fold_right f array z =
+    Array.foldBack f array z
 
-let for_all f array = Array.forall f array
+//
+[<CompilerMessage("This construct is for ML compatibility. This F# library function has been renamed. Use 'forall' instead. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let for_all f array =
+    Array.forall f array
 
+//
+[<CompilerMessage("This construct is for ML compatibility. This F# library function has been renamed. Use 'unzip' instead. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let split array =
+    Array.unzip array
 
-let split array = Array.unzip array
+//
+[<CompilerMessage("This construct is for ML compatibility. This F# library function has been renamed. Use 'zip' instead. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let combine array1 array2 =
+    Array.zip array1 array2
 
-let combine array1 array2 = Array.zip array1 array2
+//
+[<CompilerMessage("This construct is for ML compatibility. This F# library function has been renamed. Use 'create' instead. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let make (n : int) (x : 'T) =
+    Array.create n x
 
-let make (n:int) (x:'T) = Array.create n x
+//
+[<CompilerMessage("This construct is for ML compatibility. The F# library name for this function is now 'Array.toList'. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let to_list array =
+    Array.toList array
 
-let to_list array = Array.toList array
-
-let of_list list  = Array.ofList list
+//
+[<CompilerMessage("This construct is for ML compatibility. The F# library name for this function is now 'Array.ofList'. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden = true)>]
+let of_list list =
+    Array.ofList list
 

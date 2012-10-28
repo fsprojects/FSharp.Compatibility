@@ -17,23 +17,60 @@
 module FSharpx.Compatibility.OCaml.Obj
 
 //
-type t = obj
-
-//
-let repr x = box x
-
-//
-let obj (x : obj) = unbox x
-
-//
-let magic x = obj (repr x)
-
-//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'null' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
 let [<Literal>] nullobj : obj = null
 
 //
-let eq (x: 'T) (y: 'T) = LanguagePrimitives.PhysicalEquality x y
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'obj' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+type t = obj
 
 //
-let not_eq (x : 'T) (y : 'T) = not (LanguagePrimitives.PhysicalEquality x y)
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'box' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let inline repr x = box x
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'unbox' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let inline obj (x : obj) = unbox x
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'box' and/or 'unbox' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let inline magic x = obj (repr x)
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'Microsoft.FSharp.Core.LanguagePrimitives.PhysicalEquality' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let inline eq (x: 'T) (y: 'T) =
+    LanguagePrimitives.PhysicalEquality x y
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'not(Microsoft.FSharp.Core.LanguagePrimitives.PhysicalEquality(...))' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let inline not_eq (x : 'T) (y : 'T) =
+    not (LanguagePrimitives.PhysicalEquality x y)
 

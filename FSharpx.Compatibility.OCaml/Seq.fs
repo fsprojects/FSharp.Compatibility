@@ -17,10 +17,12 @@
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Seq
 
+open System
 open System.Collections.Generic
 
 
 //
+[<Obsolete("This function will be removed in a future release. Use a sqeuence expression instead.")>]
 let generate openf compute closef =
     seq {
     let r = openf ()

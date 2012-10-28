@@ -23,6 +23,21 @@ module FSharpx.Compatibility.OCaml.String
 open System
 open System.Text.RegularExpressions
 
+//
+let private test_null arg =
+    match arg with
+    | null ->
+        raise <| System.ArgumentNullException "arg"
+    | _ -> ()
+
+let private indexNotFound () =
+    raise <| System.Collections.Generic.KeyNotFoundException "An index for the character was not found in the string"
+
+//
+let private fast_get (s:string) n =
+    test_null s
+    s.[n]
+
 /// Return a copy of the argument, with special characters represented by
 /// escape sequences, following the lexical conventions of OCaml.
 /// If there is no special character in the argument, return the original
@@ -31,109 +46,208 @@ let inline escaped (str : string) : string =
     // Insert a backslash before any special characters, using a regular expression.
     Regex.Replace (str, @"[\x00\a\b\t\n\v\f\r\x1a\x22\x27\x5c\x60]", "\\$0")
 
-
-let test_null arg = match arg with null -> raise (new System.ArgumentNullException("arg")) | _ -> ()
-let invalidArg arg msg = raise (new System.ArgumentException((msg:string),(arg:string)))        
-
-let get (str:string) i =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.[i]' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let get (str : string) i =
     test_null str
     try str.[i]
     with :? System.ArgumentException -> invalidArg "i" "index out of bounds" 
 
-let length (str:string) =
+//
+let length (str : string) =
     test_null str
     str.Length
 
-let sub (s:string) (start:int) (len:int) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.[i..j]' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let sub (s : string) (start : int) (len : int) =
     test_null s
-    try s.Substring(start,len)
-    with :? System.ArgumentException -> failwith "String.sub" 
+    try s.Substring (start, len)
+    with :? System.ArgumentException ->
+        failwith "String.sub" 
 
-let compare (x:string) y = compare x y
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'Operators.compare' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let compare (x : string) (y : string) =
+    compare x y
 
-let fast_get (s:string) n =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using the overloaded 'string' operator instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let of_char (c : char) =
+    System.Char.ToString c
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'String.replicate' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let make (n : int) (c : char) : string =
+    System.String (c, n)
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.IndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let index_from (s : string) (start : int) (c : char) =  
     test_null s
-    s.[n]
+    try let r = s.IndexOf (c, start)
+        if r = -1 then indexNotFound() else r
+    with :? ArgumentException ->
+        invalidArg "start" "String.index_from" 
 
-let of_char (c:char) = System.Char.ToString(c)
-let make (n: int) (c: char) : string = new System.String(c, n)
-
-let indexNotFound() = raise (new System.Collections.Generic.KeyNotFoundException("An index for the character was not found in the string"))
-    
-let index_from (s:string) (start:int) (c:char) =  
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.LastIndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let rindex_from (s : string) (start : int) (c : char) =
     test_null s
-    try let r = s.IndexOf(c,start) in if r = -1 then indexNotFound() else r
-    with :? System.ArgumentException -> invalidArg "start" "String.index_from" 
-      
-let rindex_from (s:string) (start:int) (c:char) =
-    test_null s
-    try let r =  s.LastIndexOf(c,start) in if r = -1 then indexNotFound() else r
-    with :? System.ArgumentException -> invalidArg "start" "String.rindex_from" 
-      
+    try let r =  s.LastIndexOf (c, start)
+        if r = -1 then indexNotFound() else r
+    with :? ArgumentException ->
+        invalidArg "start" "String.rindex_from" 
 
-let index (s:string) (c:char) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.IndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let index (s : string) (c : char) =
     test_null s
     index_from s 0 c
 
-let rindex (s:string) (c:char) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.LastIndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let rindex (s : string) (c : char) =
     test_null s
     rindex_from s (length s - 1) c
 
-let contains_between (s:string) (start:int) (stop:int) (c:char) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.IndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let contains_between (s : string) (start : int) (stop : int) (c : char) =
     test_null s
-    try s.IndexOf(c,start,(stop-start+1)) <> -1
-    with :? System.ArgumentException -> invalidArg "start" "String.contains_between" 
+    try s.IndexOf (c, start, stop - start + 1) <> -1
+    with :? ArgumentException ->
+        invalidArg "start" "String.contains_between" 
 
-let contains_from (s:string) (start:int) (c:char) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.IndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let contains_from (s : string) (start : int) (c : char) =
     test_null s
-    let stop = length s - 1 in 
-    try s.IndexOf(c,start,(stop-start+1)) <> -1
-    with :? System.ArgumentException -> invalidArg "start" "String.contains_from" 
+    let stop = length s - 1
+    try s.IndexOf (c, start, stop - start + 1) <> -1
+    with :? ArgumentException ->
+        invalidArg "start" "String.contains_from" 
 
-let rcontains_from (s:string) (stop:int) (c:char) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.LastIndexOf' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let rcontains_from (s : string) (stop : int) (c : char) =
     test_null s
-    let start = 0 in
-    try s.IndexOf(c,start,(stop-start+1)) <> -1
-    with :? System.ArgumentException -> invalidArg "stop" "String.rcontains_from" 
-      
-let contains (s:string) (c:char) = contains_from s 0 c
+    let start = 0
+    try s.IndexOf (c, start, stop - start + 1) <> -1
+    with :? ArgumentException ->
+        invalidArg "stop" "String.rcontains_from" 
 
-let uppercase (s:string) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.Contains' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let contains (s : string) (c : char) =
+    contains_from s 0 c
+
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.ToUpper' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let uppercase (s : string) =
     test_null s
 #if FX_NO_TO_LOWER_INVARIANT
-    s.ToUpper(System.Globalization.CultureInfo.InvariantCulture)
+    s.ToUpper System.Globalization.CultureInfo.InvariantCulture
 #else
-    s.ToUpperInvariant()
+    s.ToUpperInvariant ()
 #endif
 
-let lowercase (s:string) =
+//
+[<CompilerMessage(
+    "This construct is for ML compatibility. \
+    Consider using 'str.ToLower()' instead. \
+    This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",
+    62, IsHidden = true)>]
+let lowercase (s : string) =
     test_null s
 #if FX_NO_TO_LOWER_INVARIANT
-    s.ToLower(System.Globalization.CultureInfo.InvariantCulture)
+    s.ToLower System.Globalization.CultureInfo.InvariantCulture
 #else
-    s.ToLowerInvariant()
+    s.ToLowerInvariant ()
 #endif
 
-let capitalize (s:string) =
+//
+let capitalize (s : string) =
     test_null s
-    if s.Length = 0 then "" 
-    else (uppercase s.[0..0]) + s.[1..s.Length-1]
+    if s.Length = 0 then ""
+    else (uppercase s.[0..0]) + s.[1 .. s.Length - 1]
 
-let uncapitalize (s:string) =
+//
+let uncapitalize (s : string) =
     test_null s
-    if s.Length = 0 then  ""
-    else (lowercase s.[0..0]) + s.[1..s.Length-1]
+    if s.Length = 0 then ""
+    else (lowercase s.[0..0]) + s.[1 .. s.Length - 1]
 
 #if FX_NO_STRING_SPLIT_OPTIONS
 #else
+//
 let split (c : char list) =
-    let ca = Array.ofList c 
-    fun (s:string) ->
+    let ca = Array.ofList c
+    fun (s : string) ->
         test_null s
-        Array.toList(s.Split(ca, System.StringSplitOptions.RemoveEmptyEntries))
+        s.Split (ca, StringSplitOptions.RemoveEmptyEntries)
+        |> Array.toList
 #endif
 
+//
 let trim (c : char list) =
-    let ca = Array.ofList c 
-    fun (s:string) -> s.Trim(ca)
+    let ca = Array.ofList c
+    fun (s : string) ->
+        s.Trim ca
 

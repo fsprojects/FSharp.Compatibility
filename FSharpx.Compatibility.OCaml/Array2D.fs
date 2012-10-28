@@ -26,25 +26,30 @@ open System.Runtime.InteropServices
 #nowarn "51"
 
 
-let inline pinObjUnscoped (obj: obj) =  
-    GCHandle.Alloc(obj,GCHandleType.Pinned) 
+let inline pinObjUnscoped (obj : obj) =
+    GCHandle.Alloc(obj,GCHandleType.Pinned)
 
-let inline pinObj (obj: obj) f = 
+let inline pinObj (obj : obj) f =
     let gch = pinObjUnscoped obj 
     try f gch
     finally
-        gch.Free()
+        gch.Free ()
 
+[<Unverifiable>]
 [<NoDynamicInvocation>]
-let inline pin (arr: 'T [,]) (f : nativeptr<'T> -> 'U) = 
-    pinObj (box arr) (fun _ -> f (&&arr.[0,0]))
+let inline pin (arr : 'T[,]) (f : nativeptr<'T> -> 'U) =
+    pinObj (box arr) <| fun _ -> f &&arr.[0,0]
     
+[<Unverifiable>]
 [<NoDynamicInvocation>]
-let inline pinUnscoped (arr: 'T [,]) : nativeptr<'T> * _ = 
-    let gch = pinObjUnscoped (box arr) 
+let inline pinUnscoped (arr : 'T [,]) : nativeptr<'T> * _ =
+    let gch = pinObjUnscoped (box arr)
     &&arr.[0,0], gch
 
+[<Unverifiable>]
 [<NoDynamicInvocation>]
-let inline pin_unscoped arr = pinUnscoped arr
+[<Obsolete("This function has been renamed to 'pinUnscoped'")>]
+let inline pin_unscoped arr =
+    pinUnscoped arr
 
 
