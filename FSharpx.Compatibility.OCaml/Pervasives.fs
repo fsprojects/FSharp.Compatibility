@@ -26,20 +26,218 @@ open System.Collections.Generic
 #nowarn "69"  // interface implementations in intrinsic extensions
 
 
+(*** Exceptions ***)
+
+// raise
+// invalid_arg
+// failwith
+// exception Exit
+
+
+
+(*** Comparisons ***)
+
+/// e1 == e2 tests for physical equality of e1 and e2.
+let inline ( == ) x y =
+    LanguagePrimitives.PhysicalEquality x y
+
+/// Negation of (==).
+let inline ( != ) x y =
+    not <| LanguagePrimitives.PhysicalEquality x y
+
+
+(*** Boolean operations ***)
+
+// NOTE : The 'not', (&&), and (||) operators are already
+// provided in the F# Core Library (FSharp.Core).
+
+//
+[<Obsolete("Deprecated. The (&&) operator should be used instead.")>]
+let inline (&) (x : bool) (y : bool) =
+    x && y
+
+//
+[<Obsolete("Deprecated. The (||) operator should be used instead.")>]
+let inline (or) (x : bool) (y : bool) =
+    x || y
+
+
+(*** Integer arithmetic ***)
+
+/// Integer remainder. If y is not zero, the result of x mod y satisfies the following properties: x = (x / y) * y + x mod y and abs(x mod y) <= abs(y) - 1.
+/// If y = 0, x mod y raises Division_by_zero. Note that x mod y is negative only if x < 0.
+let inline (mod) (x : int) (y : int) =
+    Operators.(%) x y
+
+/// The greatest representable integer.
+let [<Literal>] max_int =
+    System.Int32.MaxValue
+
+/// The smallest representable integer.
+let [<Literal>] min_int =
+    System.Int32.MinValue
+
+
+(* Bitwise operations *)
+
+/// Bitwise logical and.
+let inline (land) (x : int) (y : int) =
+    Operators.(&&&) x y
+
+/// Bitwise logical or.
+let inline (lor) (x : int) (y : int) =
+    Operators.(|||) x y
+
+/// Bitwise logical exclusive or.
+let inline (lxor) (x : int) (y : int) =
+    Operators.(^^^) x y
+
+/// Bitwise logical negation.
+let inline lnot (x : int) =
+    Operators.(~~~) x
+
+/// n lsl m shifts n to the left by m bits.
+/// The result is unspecified if m < 0 or m >= bitsize, where bitsize is 32 on a 32-bit platform and 64 on a 64-bit platform.
+let inline (lsl) (x : int) (y : int) =
+    Operators.(<<<) x y
+
+/// n lsr m shifts n to the right by m bits.
+/// This is a logical shift: zeroes are inserted regardless of the sign of n. The result is unspecified if m < 0 or m >= bitsize.
+let inline (lsr) (x : int) (y : int) =
+    int32 (uint32 x >>> y)
+
+/// n asr m shifts n to the right by m bits.
+/// This is an arithmetic shift: the sign bit of n is replicated. The result is unspecified if m < 0 or m >= bitsize.
+let inline (asr) (x : int) (y : int) =
+    Operators.(>>>) x y
+
+
 (*** Floating-point arithmetic ***)
+
+/// Unary negation.
+let inline ( ~-. ) (x : float) = -x
+
+/// Unary addition.
+let inline ( ~+. ) (x : float) = x
+
+/// Floating-point addition.
+let inline ( +. ) (x : float) (y : float) = x + y
+
+/// Floating-point subtraction.
+let inline ( -. ) (x : float) (y : float) = x - y
+
+/// Floating-point multiplication.
+let inline ( *. ) (x : float) (y : float) = x * y
+
+/// Floating-point division.
+let inline ( /. ) (x : float) (y : float) = x / y
+
+/// Exponentiation.
+let inline ( ** ) (x : float) (y : float) =
+    Math.Pow (x, y)
+
+// NOTE : The following functions are already
+// provided in the F# Core Library (FSharp.Core):
+//  sqrt
+//  exp
+//  log
+//  log10
+//  cos
+//  sin
+//  tan
+//  acos
+//  asin
+//  atan
+//  atan2
+//  cosh
+//  sinh
+//  tanh
+//  ceil
+//  floor
+
+//
+let hypot (x : float) (y : float) =
+    raise <| System.NotImplementedException "hypot"
+
+//
+let expm1 (x : float) =
+    raise <| System.NotImplementedException "expm1"
+
+//
+let log1p (x : float) =
+    raise <| System.NotImplementedException "log1p"
+
+//
+let inline abs_float (x : float) =
+    Operators.abs x
+
+//
+let copysign (x : float) (y : float) : float =
+    raise <| System.NotImplementedException "copysign"
+
+//
+let mod_float (a : float) (b : float) : float =
+    a - b * truncate (a / b)
+
+//
+let frexp (f : float) : float * int =
+    raise <| System.NotImplementedException "frexp"
+
+//
+let ldexp (x : float) (n : int) : float =
+    x * (2.0 ** float n)
+
+//
+let modf (f : float) : float * float =
+    let integral = Operators.floor f
+    (integral, f - integral)
+
+/// Convert an integer to floating-point.
+let inline float_of_int (value : int) : float =
+    float value
+
+/// Truncate the given floating-point number to an integer.
+/// The result is unspecified if the argument is nan or falls outside the range of representable integers.
+let inline int_of_float (value : float) : int =
+    int32 value
+
+/// Positive infinity.
+let [<Literal>] infinity =
+    System.Double.PositiveInfinity
+
+/// Negative infinity.
+let [<Literal>] neg_infinity =
+    System.Double.NegativeInfinity
+
+//
+let [<Literal>] nan =
+    System.Double.NaN
+
+/// The largest positive finite value of type float.
+let [<Literal>] max_float =
+    System.Double.MaxValue
+
+/// The smallest positive, non-zero, non-denormalized value of type float.
+let [<Literal>] min_float =
+    System.Double.MinValue
+
+/// The difference between 1.0 and the smallest exactly representable floating-point number greater than 1.0.
+let [<Literal>] epsilon_float = 0x3CB0000000000000LF // Int64.float_of_bits 4372995238176751616L
+
+
 
 /// The five classes of floating-point numbers, as determined by
 /// the <see cref="classify_float"/> function.
 type fpclass =
-    /// Normal number, none of the below
+    /// Normal number.
     | FP_normal
-    /// Number very close to 0.0, has reduced precision
+    /// Number very close to 0.0, has reduced precision.
     | FP_subnormal
-    /// Number is 0.0 or -0.0
+    /// Number is 0.0 or -0.0.
     | FP_zero
-    /// Number is positive or negative infinity
+    /// Number is positive or negative infinity.
     | FP_infinite
-    /// Not a number: result of an undefined operation
+    /// Not a number: result of an undefined operation.
     | FP_nan
 
 /// Return the class of the given floating-point number:
@@ -58,13 +256,213 @@ let classify_float (value : float) : fpclass =
         FP_normal
 
 
+(*** String operations ***)
+
+//
+let inline (^) (x : string) (y : string) =
+    System.String.Concat (x, y)
+
+
+(*** Character operations ***)
+
+/// Return the ASCII code of the argument.
+let inline int_of_char (c : char) : int =
+    raise <| System.NotImplementedException "int_of_char"
+
+/// Return the character with the given ASCII code.
+let char_of_int (value : int) : char =
+    // Preconditions
+    // TODO : Raise Invalid_argument "char_of_int" if the argument is outside the range 0--255.
+    raise <| System.NotImplementedException "char_of_int"
+
+
+(*** Unit operations ***)
+
+// NOTE : The 'ignore' function is already provided
+// in the F# Core Library (FSharp.Core).
+
+
+(*** String conversion functions ***)
+
+/// Return the string representation of a boolean.
+let inline string_of_bool (value : bool) : string =
+    if value then "true" else "false"
+
+/// Convert the given string to a boolean.
+let bool_of_string (str : string) : bool =
+    // Preconditions
+    // TODO : Raise Invalid_argument "bool_of_string" if the string is not "true" or "false".
+    raise <| System.NotImplementedException "bool_of_string"
+
+/// Return the string representation of an integer, in decimal.
+let inline string_of_int (value : int) : string =
+    value.ToString ()
+
+/// Convert the given string to an integer.
+/// The string is read in decimal (by default) or in hexadecimal (if it begins with 0x or 0X),
+/// octal (if it begins with 0o or 0O), or binary (if it begins with 0b or 0B).
+let int_of_string (str : string) : int =
+    // Preconditions
+    // TODO : Raise Failure "int_of_string" if the given string is not a valid representation of an integer,
+    // or if the integer represented exceeds the range of integers representable in type int.
+    raise <| System.NotImplementedException "int_of_string"
+
+/// Return the string representation of a floating-point number.
+let string_of_float (value : float) : string =
+    raise <| System.NotImplementedException "string_of_float"
+
+/// Convert the given string to a float.
+let float_of_string (str : string) : float =
+    // Preconditions
+    // TODO : Raise Failure "float_of_string" if the given string is not a valid representation of a float.
+    raise <| System.NotImplementedException "float_of_string"
+
+
+(*** Pair operations ***)
+
+// NOTE : The 'fst' and 'snd' functions are already
+// provided in the F# Core Library (FSharp.Core).
+
+
+(*** List operations ***)
+
+// NOTE : The '@' operator is already provided
+// in the F# Core Library (FSharp.Core).
+
+
+(*** Input/output ***)
+// TODO
+
+
+(* Output functions on standard output *)
+
+/// Print a character on standard output.
+let print_char (c : char) : unit =
+    raise <| System.NotImplementedException "print_char"
+
+/// Print a string on standard output.
+let print_string (str : string) : unit =
+    raise <| System.NotImplementedException "print_string"
+
+/// Print an integer, in decimal, on standard output.
+let print_int (value : int) : unit =
+    raise <| System.NotImplementedException "print_int"
+
+/// Print a floating-point number, in decimal, on standard output.
+let print_float (value : float) : unit =
+    raise <| System.NotImplementedException "print_float"
+
+/// Print a string, followed by a newline character,
+/// on standard output and flush standard output.
+let print_endline (str : string) : unit =
+    raise <| System.NotImplementedException "print_endline"
+
+/// Print a newline character on standard output, and flush standard output.
+/// This can be used to simulate line buffering of standard output.
+let print_newline () : unit =
+    raise <| System.NotImplementedException "print_newline"
+
+
+(* Output functions on standard error *)
+
+/// Print a character on standard error.
+let prerr_char (c : char) : unit =
+    raise <| System.NotImplementedException "prerr_char"
+
+/// Print a string on standard error.
+let prerr_string (str : string) : unit =
+    raise <| System.NotImplementedException "prerr_string"
+
+/// Print an integer, in decimal, on standard error.
+let prerr_int (value : int) : unit =
+    raise <| System.NotImplementedException "prerr_int"
+
+/// Print a floating-point number, in decimal, on standard error.
+let prerr_float (value : float) : unit =
+    raise <| System.NotImplementedException "prerr_float"
+
+/// Print a string, followed by a newline character,
+/// on standard error and flush standard error.
+let prerr_endline (str : string) : unit =
+    raise <| System.NotImplementedException "prerr_endline"
+
+/// Print a newline character on standard error, and flush standard error.
+/// This can be used to simulate line buffering of standard error.
+let prerr_newline () : unit =
+    raise <| System.NotImplementedException "prerr_newline"
+
+
+(* Input functions on standard input *)
+
+/// Flush standard output, then read characters from standard input until a newline character is encountered.
+/// Return the string of all characters read, without the newline character at the end.
+let read_line () : string =
+    raise <| System.NotImplementedException "read_line"
+
+/// Flush standard output, then read one line from standard input and convert it to an integer.
+let read_int () : int =
+    // Preconditions
+    // TODO : Raise Failure "int_of_string" if the line read is not a valid representation of an integer.
+    raise <| System.NotImplementedException "read_int"
+
+/// Flush standard output, then read one line from standard input and convert it to a floating-point number.
+/// The result is unspecified if the line read is not a valid representation of a floating-point number.
+let read_float () : float =
+    raise <| System.NotImplementedException "read_float"
+
+
+(* General output functions *)
+// TODO
+
+
+(* General input functions *)
+// TODO
+
+
+(* Operations on large files *)
+
+(*
+/// <summary>Operations on large files.</summary>
+/// <remarks>This sub-module provides 64-bit variants of the channel functions that manipulate
+/// file positions and file sizes. By representing positions and sizes by 64-bit integers
+/// (type int64) instead of regular integers (type int), these alternate functions allow operating
+/// on files whose sizes are greater than max_int.</remarks>
+module LargeFile =
+    //
+    let seek_out (channel : out_channel) (pos : int64) : unit =
+        raise <| System.NotImplementedException "LargeFile.seek_out"
+
+    //
+    let pos_out (channel : out_channel) : int64 =
+        raise <| System.NotImplementedException "LargeFile.pos_out"
+
+    //
+    let out_channel_length (channel : out_channel) : int64 =
+        raise <| System.NotImplementedException "LargeFile.out_channel_length"
+
+    //
+    let seek_in (channel : in_channel) (pos : int64) : unit =
+        raise <| System.NotImplementedException "LargeFile.seek_in"
+
+    //
+    let pos_in (channel : in_channel) : int64 =
+        raise <| System.NotImplementedException "LargeFile.pos_in"
+
+    //
+    let in_channel_length (channel : in_channel) : int64 =
+        raise <| System.NotImplementedException "LargeFile.in_channel_length"
+*)
+
+(*** References ***)
+
+// NOTE : The types and functions in this section
+// are already available in the F# Core Library (FSharp.Core).
+
+
 (*** Operations on format strings ***)
 
-//
-type format4<'a, 'b, 'c, 'd> = format6<'a, 'b, 'c, 'c, 'c, 'd>
-
-//
-type format<'a, 'b, 'c> = format4<'a, 'b, 'c, 'c>
+type format4<'a, 'b, 'c, 'd> = Microsoft.FSharp.Core.Format<'a, 'b, 'c, 'd>
+type format<'a, 'b, 'c> = Microsoft.FSharp.Core.Format<'a, 'b, 'c, 'c>
 
 
 (*** Program termination ***)
@@ -139,7 +537,7 @@ exception Undefined
 exception End_of_file      = System.IO.EndOfStreamException
 exception Out_of_memory    = System.OutOfMemoryException
 exception Division_by_zero = System.DivideByZeroException
-exception Stack_overflow   = System.StackOverflowException 
+exception Stack_overflow   = System.StackOverflowException
 
 let Not_found<'a> = (new KeyNotFoundException("The item was not found during a search or in a collection") :> exn)
 let (|Not_found|_|) (inp:exn) = match inp with :? KeyNotFoundException -> Some() | _ -> None
@@ -151,25 +549,9 @@ let invalid_arg s = raise (System.ArgumentException(s))
 
 let not_found() = raise Not_found
 
-let inline (==)    (x:'a) (y:'a) = LanguagePrimitives.PhysicalEquality x y
-let inline (!=)    (x:'a) (y:'a) = not (LanguagePrimitives.PhysicalEquality x y)
-let inline (mod)  (x:int) (y:int)  = Operators.(%) x y
-let inline (land) (x:int) (y:int)  = Operators.(&&&) x y
-let inline (lor)  (x:int) (y:int)  = Operators.(|||) x y
-let inline (lxor) (x:int) (y:int)  = Operators.(^^^) x y
-let inline lnot   (x:int)          = Operators.(~~~) x
-let inline (lsl)  (x:int) (y:int)  = Operators.(<<<) x y
-let inline (lsr)  (x:int) (y:int)  = int32 (uint32 x >>> y)
-let inline (asr)  (x:int) (y:int)  = Operators.(>>>) x y
+
 
 let int_neg (x:int) = -x
-let (~-.)  (x:float)           =  -x
-let (~+.)  (x:float)           =  x
-let (+.)   (x:float) (y:float) =  x+y
-let (-.)   (x:float) (y:float) =  x-y
-let ( *.)  (x:float) (y:float) =  x*y
-let ( /.)  (x:float) (y:float) =  x/y
-
 let inline (.())   (arr: _[]) n = arr.[n]
 let inline (.()<-) (arr: _[]) n x = arr.[n] <- x
 
@@ -190,30 +572,6 @@ let truncatef (x:float) =
 #else
 let truncatef (x:float) = System.Math.Truncate x
 #endif
-let mod_float x y = x - y * truncatef(x/y)
-let float_of_int (x:int) =  float x
-let ldexp x (n:int) = x * (2.0 ** float n)
-let modf x = let integral = Operators.floor x in (integral, x - integral)
-let int_of_float x =  truncate x
-
-let neg_infinity = System.Double.NegativeInfinity
-let max_float    = System.Double.MaxValue 
-let min_float    =  0x0010000000000000LF
-let epsilon_float = 0x3CB0000000000000LF // Int64.float_of_bits 4372995238176751616L
-
-type fpclass = FP_normal (* | FP_subnormal *)  | FP_zero| FP_infinite | FP_nan      
-
-let classify_float (x:float) = 
-    if System.Double.IsNaN x then FP_nan
-    elif System.Double.IsNegativeInfinity x then FP_infinite
-    elif System.Double.IsPositiveInfinity x then FP_infinite
-    elif x = 0.0 then FP_zero
-    else FP_normal
-       
-let abs_float (x:float)           = Operators.abs x
-
-let int_of_char (c:char) = System.Convert.ToInt32(c)
-let char_of_int (x:int) = System.Convert.ToChar(x)
 
 let string_of_bool b = if b then "true" else "false"
 let bool_of_string s = 
@@ -226,7 +584,6 @@ let string_of_int (x:int) = x.ToString()
 let int_of_string (s:string) = try int32 s with _ -> failwith "int_of_string"
 let string_of_float (x:float) = x.ToString()
 let float_of_string (s:string) = try float s with _ -> failwith "float_of_string"
-
 let string_to_int   x = int_of_string x
 
 
@@ -749,8 +1106,7 @@ type OutChannelImpl with
     override x.Write(c:char[]) = output_chars (x :> out_channel) c 0 c.Length
     override x.Write((c:char[]),(index:int),(count:int)) = output_chars (x :> out_channel) c index count
     
-type ('a,'b,'c,'d) format4 = Microsoft.FSharp.Core.Format<'a,'b,'c,'d>
-type ('a,'b,'c) format = Microsoft.FSharp.Core.Format<'a,'b,'c,'c>
+
 
 exception Exit
 
@@ -764,69 +1120,7 @@ module Pervasives =
     let exit (n:int) = Operators.exit n
 #endif
 
-    let incr x = x.contents <- x.contents + 1
-    let decr x = x.contents <- x.contents - 1
-
-    let (@) l1 l2 = l1 @ l2
-    // NOTE: inline to call site since LanguagePrimitives.<funs> have static type optimisation 
-    let (=)     (x:'a) (y:'a) = Operators.(=) x y
-    let (<>)    (x:'a) (y:'a) = Operators.(<>) x y 
-    let (<)     (x:'a) (y:'a) = Operators.(<) x y
-    let (>)     (x:'a) (y:'a) = Operators.(>) x y
-    let (<=)    (x:'a) (y:'a) = Operators.(<=) x y
-    let (>=)    (x:'a) (y:'a) = Operators.(>=) x y
-    let min     (x:'a) (y:'a) = Operators.min x y
-    let max     (x:'a) (y:'a) = Operators.max x y
-    let compare (x:'a) (y:'a) = LanguagePrimitives.GenericComparison x y
-
-    let (~+) x = Operators.(~+) x
-    //  inline (~-) x = LanguagePrimitives.(~-) x 
-
-    let (+) (x:int) (y:int)   = Operators.(+) x y
-    let (-) (x:int) (y:int)   = Operators.(-) x y
-    let ( * ) (x:int) (y:int) = Operators.( * ) x y
-    let (/) (x:int) (y:int)   = Operators.(/) x y
-    let not (b:bool) = Operators.not b
-    type 'a ref = Microsoft.FSharp.Core.Ref<'a>
-    type 'a option = Microsoft.FSharp.Core.Option<'a>
-    type 'a list = Microsoft.FSharp.Collections.List<'a>
-    type exn = System.Exception
-    let raise (e:exn) = Operators.raise e
-    let failwith s = raise (Failure s)
-    let fst (x,_y) = x
-    let snd (_x,y) = y
-
-    let ref x = { contents=x }
-    let (!) x = x.contents
-    let (:=) x y = x.contents <- y
-
-    let float (x:int) =  Operators.float x
-    let float32 (n:int) =  Operators.float32 n
-    let abs (x:int) = Operators.abs x
-    let ignore _x = ()
     let invalid_arg s = raise (System.ArgumentException(s))
-    let (^) (x:string) (y:string) = System.String.Concat(x,y)
-    let sqrt      (x:float)           = Operators.sqrt x
-    let exp       (x:float)           = Operators.exp x
-    let log       (x:float)           = Operators.log x
-    let log10     (x:float)           = Operators.log10 x
-    let cos       (x:float)           = Operators.cos x
-    let sin       (x:float)           = Operators.sin x
-    let tan       (x:float)           = Operators.tan x
-    let acos      (x:float)           = Operators.acos x
-    let asin      (x:float)           = Operators.asin x
-    let atan      (x:float)           = Operators.atan x
-    let atan2     (x:float) (y:float) = Operators.atan2 x y
-    let cosh      (x:float)           = Operators.cosh x
-    let sinh      (x:float)           = Operators.sinh x
-    let tanh      (x:float)           = Operators.tanh x
-    let ceil      (x:float)           = Operators.ceil x
-    let floor     (x:float)           = Operators.floor x
-
-    let ( ** ) (x:float) (y:float) = Operators.( ** ) x y
-    let truncate (x:float) = Operators.int32 x
-    let nan          = System.Double.NaN 
-    let infinity     = System.Double.PositiveInfinity
 
 
 *)
