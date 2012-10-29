@@ -2,9 +2,9 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharpx.Compatibility.OCaml.Format</id>
-        <version>0.1.5</version>
+        <version>0.1.6</version>
         <dependencies>
-            <dependency id="FSharpx.Compatibility.OCaml" version="0.1.5" />
+            <dependency id="FSharpx.Compatibility.OCaml" version="0.1.6" />
         </dependencies>
         <title>OCaml Compatibility Library for F# (Format module)</title>
         <authors>Jack Pappas</authors>
