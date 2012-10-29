@@ -11,7 +11,7 @@
 // Reference:
 // http://caml.inria.fr/pub/docs/manual-ocaml/libref/Array.html
 
-//
+/// Array operations.
 [<CompilerMessage(
     "This module is for ML compatibility. \
     This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",

@@ -1,7 +1,7 @@
 ﻿(*  OCaml Compatibility Library for F# (Format module)
     (FSharpx.Compatibility.OCaml.Format)
 
-    Copyright (c) 1996  Institut National de Recherche en 
+    Copyright (c) 1996  Institut National de Recherche en
                         Informatique et en Automatique
     Copyright (c) Jack Pappas 2012
         http://github.com/jack-pappas
@@ -11,7 +11,7 @@
     See the LICENSE file for details. *)
 
 
-//
+/// Formatted output functions.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module internal FSharpx.Compatibility.OCaml.Printf
 

@@ -11,7 +11,7 @@
 // References:
 // http://caml.inria.fr/pub/docs/manual-ocaml/libref/Pervasives.html
 
-//
+/// The initially opened module.
 [<AutoOpen>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Pervasives

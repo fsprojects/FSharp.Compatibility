@@ -8,7 +8,7 @@
     This code is distributed under the terms of the Apache 2.0 license.
     See the LICENSE file for details. *)
 
-//
+/// Deferred computations.
 [<CompilerMessage(
     "This module is for ML compatibility. \
     This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.",

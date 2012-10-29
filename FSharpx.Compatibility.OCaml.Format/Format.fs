@@ -13,8 +13,7 @@
 // References:
 // http://caml.inria.fr/pub/docs/manual-ocaml/libref/Format.html
 
-/// A pretty-printing facility and definition of formatters for ``parallel''
-/// (i.e. unrelated or independent) pretty-printing on multiple out channels.
+/// Pretty printing.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharpx.Compatibility.OCaml.Format
 
@@ -213,7 +212,8 @@ exception Empty_queue
 
 let peek_queue = function
   | { body = Cons { head = x; tail = _; }; } -> x
-  | { body = Nil; } -> raise Empty_queue
+  | { body = Nil; } ->
+    raise Empty_queue
 
 
 let take_queue = function
@@ -221,7 +221,8 @@ let take_queue = function
     q.body <- tl;
     if tl = Nil then q.insert <- Nil; (* Maintain the invariant. *)
     x
-  | { body = Nil; } -> raise Empty_queue
+  | { body = Nil; } ->
+    raise Empty_queue
 
 
 (* Enter a token in the pretty-printer queue. *)
@@ -456,8 +457,8 @@ let rec advance_loop state =
 
 
 let advance_left state =
-  try advance_loop state with
-  | Empty_queue -> ()
+  try advance_loop state
+  with Empty_queue -> ()
 
 
 let enqueue_advance state tok = pp_enqueue state tok; advance_left state
