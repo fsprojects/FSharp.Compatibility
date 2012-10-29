@@ -18,6 +18,8 @@ module FSharpx.Compatibility.OCaml.Pervasives
 
 open System
 open System.Collections.Generic
+open System.IO
+open System.Text
 
 #nowarn "62" // compatibility warnings
 #nowarn "35"  // 'deprecated' warning about redefining '<' etc.
@@ -267,13 +269,16 @@ let inline (^) (x : string) (y : string) =
 
 /// Return the ASCII code of the argument.
 let inline int_of_char (c : char) : int =
-    raise <| System.NotImplementedException "int_of_char"
+    int c
 
 /// Return the character with the given ASCII code.
 let char_of_int (value : int) : char =
     // Preconditions
-    // TODO : Raise Invalid_argument "char_of_int" if the argument is outside the range 0--255.
-    raise <| System.NotImplementedException "char_of_int"
+    if value < int Byte.MinValue ||
+        value > int Byte.MaxValue then
+        raise <| Invalid_argument "char_of_int"
+    
+    char value
 
 
 (*** Unit operations ***)
@@ -290,9 +295,11 @@ let inline string_of_bool (value : bool) : string =
 
 /// Convert the given string to a boolean.
 let bool_of_string (str : string) : bool =
-    // Preconditions
-    // TODO : Raise Invalid_argument "bool_of_string" if the string is not "true" or "false".
-    raise <| System.NotImplementedException "bool_of_string"
+    match str with
+    | "true" -> true
+    | "false" -> false
+    | _ ->
+        raise <| Invalid_argument "bool_of_string"
 
 /// Return the string representation of an integer, in decimal.
 let inline string_of_int (value : int) : string =
@@ -302,20 +309,33 @@ let inline string_of_int (value : int) : string =
 /// The string is read in decimal (by default) or in hexadecimal (if it begins with 0x or 0X),
 /// octal (if it begins with 0o or 0O), or binary (if it begins with 0b or 0B).
 let int_of_string (str : string) : int =
-    // Preconditions
-    // TODO : Raise Failure "int_of_string" if the given string is not a valid representation of an integer,
-    // or if the integer represented exceeds the range of integers representable in type int.
-    raise <| System.NotImplementedException "int_of_string"
+    // TODO : This function should also check the parsed value -- if it's
+    // outside the range of a 31-bit integer, then fail in that case too.
+    if str.StartsWith ("0x", StringComparison.OrdinalIgnoreCase) then
+        try Convert.ToInt32 (str.[2..], 16)
+        with _ -> failwith "int_of_string"
+    elif str.StartsWith ("0o", StringComparison.OrdinalIgnoreCase) then
+        try Convert.ToInt32 (str.[2..], 8)
+        with _ -> failwith "int_of_string"
+    elif str.StartsWith ("0b", StringComparison.OrdinalIgnoreCase) then
+        try Convert.ToInt32 (str.[2..], 2)
+        with _ -> failwith "int_of_string"
+    else
+        match Int32.TryParse str with
+        | true, value ->
+            value
+        | false, _ ->
+            failwith "int_of_string"
 
 /// Return the string representation of a floating-point number.
 let string_of_float (value : float) : string =
-    raise <| System.NotImplementedException "string_of_float"
+    value.ToString ()
 
 /// Convert the given string to a float.
 let float_of_string (str : string) : float =
-    // Preconditions
-    // TODO : Raise Failure "float_of_string" if the given string is not a valid representation of a float.
-    raise <| System.NotImplementedException "float_of_string"
+    try float str
+    with _ ->
+        failwith "float_of_string"
 
 
 (*** Pair operations ***)
@@ -331,65 +351,777 @@ let float_of_string (str : string) : float =
 
 
 (*** Input/output ***)
-// TODO
 
+type out_channel = TextWriter
+type in_channel = System.IO.TextReader
+
+type open_flag =
+    | Open_rdonly | Open_wronly | Open_append
+    | Open_creat | Open_trunc | Open_excl
+    | Open_binary | Open_text
+#if FX_NO_NONBLOCK_IO
+#else
+    | Open_nonblock
+#endif
+    | Open_encoding of Encoding
+
+//--------------------------------------------------------------------------
+// I/O
+//
+// OCaml-compatible channels conflate binary and text IO. It is very inconvenient to introduce
+// out_channel as a new abstract type, as this means functions like fprintf can't be used in 
+// conjunction with TextWriter values.  Hence we pretend that OCaml channels are TextWriters, and 
+// implement TextWriters in such a way the the implementation contains an optional binary stream
+// which is utilized by the OCaml binary I/O methods.
+//
+// Notes on the implementation: We discriminate between three kinds of 
+// readers/writers since various operations are possible on each kind.
+// StreamReaders/StreamWriters inherit from text readers/writers and
+// thus support more functionality.  We could just support two 
+// constructors (Binary and Text) and use dynamic type tests on the underlying .NET
+// objects to detect the cases where we have StreamWriters.
+//--------------------------------------------------------------------------
+
+type writer =
+    | StreamW of StreamWriter
+    | TextW of (unit -> TextWriter)
+    | BinaryW of BinaryWriter
+
+//
+let private defaultEncoding =
+#if FX_NO_DEFAULT_ENCODING
+    // default encoding on Silverlight is UTF8 (to aling with e.g. System.IO.StreamReader)
+    Encoding.UTF8
+#else
+    Encoding.Default
+#endif
+
+//
+type OutChannelImpl (w : writer) =
+    inherit TextWriter ()
+    //
+    let mutable writer = w
+
+    //
+    override __.Encoding
+        with get () =
+            raise <| System.NotImplementedException "OutChannelImpl.get_Encoding"
+
+    //
+    member x.Writer
+        with get () = writer
+        and set w = writer <- w
+    
+    //
+    member x.Stream =
+        match writer with
+        | TextW _ -> failwith "cannot access a stream for this channel"
+        | BinaryW bw -> bw.BaseStream
+        | StreamW sw -> sw.BaseStream
+
+    //
+    member x.TextWriter =
+        match writer with
+        | StreamW sw ->
+            sw :> TextWriter
+        | TextW tw ->
+            tw ()
+        | BinaryW _ ->
+            failwith "Binary channels created using the OCaml-compatible Pervasives.open_out_bin cannot be used as TextWriters. \
+                        Consider using 'System.IO.BinaryWriter' in preference to creating channels using open_out_bin."
+        
+    //
+    member x.StreamWriter = 
+        match writer with 
+        | StreamW sw -> sw
+        | _ ->
+            failwith "cannot access a stream writer for this channel"
+
+    //
+    member x.BinaryWriter =
+        match writer with
+        | BinaryW w -> w
+        | _ ->
+            failwith "cannot access a binary writer for this channel"
+
+
+//
+type reader =
+    | StreamR of StreamReader
+    | TextR of (unit -> TextReader)
+    | BinaryR of BinaryReader
+
+/// See OutChannelImpl
+type InChannelImpl (r : reader) =
+    inherit TextReader ()
+    //
+    let mutable reader = r
+
+    //
+    member x.Reader
+        with get () = reader
+        and set r = reader <- r
+    
+    //
+    member x.Stream =
+        match reader with
+        | TextR _ -> failwith "cannot access a stream for this channel"
+        | BinaryR bw -> bw.BaseStream
+        | StreamR sw -> sw.BaseStream
+
+    //
+    member x.TextReader =
+        match reader with
+        | StreamR sw ->
+            sw :> TextReader
+        | TextR tw ->
+            tw ()
+        | _ ->
+            failwith "Binary channels created using the OCaml-compatible Pervasives.open_in_bin cannot be used as TextReaders. \
+                        If necessary use the OCaml compatible binary input methods Pervasvies.input etc. to read from this channel. \
+                        Consider using 'System.IO.BinaryReader' in preference to channels created using open_in_bin."
+        
+    //
+    member x.StreamReader =
+        match reader with
+        | StreamR sw -> sw
+        | _ -> failwith "cannot access a stream writer for this channel"
+
+    //
+    member x.BinaryReader =
+        match reader with
+        | BinaryR w -> w
+        | _ -> failwith "cannot access a binary writer for this channel"
+
+//
+let (!!) (os : out_channel) =
+    match os with
+    | :? OutChannelImpl as os ->
+        os.Writer
+    | :? StreamWriter as sw ->
+        StreamW sw
+    | _ ->
+        TextW (fun () -> os)
+
+//
+let (<--) (os: out_channel) os' =
+    match os with
+    | :? OutChannelImpl as os ->
+        os.Writer <- os'
+    | _ ->
+        failwith "the mode may not be adjusted on a writer not created with one of the Pervasives.open_* functions"
+    
+//
+let stream_to_BinaryWriter s =
+    BinaryW (new BinaryWriter (s))
+
+//
+let stream_to_StreamWriter (encoding : Encoding) (s : Stream) =
+    StreamW (new StreamWriter (s, encoding))
+
+//
+module OutChannel =
+    let to_Stream (os : out_channel) =
+        match !!os with
+        | BinaryW bw ->
+            bw.BaseStream
+        | StreamW sw ->
+            sw.BaseStream
+        | TextW _ ->
+            failwith "to_Stream: cannot access a stream for this channel"
+      
+    let to_StreamWriter (os : out_channel) =
+        match !!os with
+        | StreamW sw -> sw
+        | _ -> failwith "to_StreamWriter: cannot access a stream writer for this channel"
+      
+    let to_TextWriter (os : out_channel) =
+        match !!os with
+        | StreamW sw ->
+            sw :> TextWriter
+        | TextW tw ->
+            tw ()
+        | _ -> os
+      
+    let of_StreamWriter w =
+        new OutChannelImpl (StreamW w)
+        :> out_channel
+
+    let to_BinaryWriter (os : out_channel) =
+        match !!os with
+        | BinaryW bw -> bw
+        | _ -> failwith "to_BinaryWriter: cannot access a binary writer for this channel"
+      
+    let of_BinaryWriter w =
+        new OutChannelImpl (BinaryW w)
+        :> out_channel
+      
+    let of_TextWriter (w : TextWriter) =
+        let absw =
+            match w with
+            | :? StreamWriter as sw ->
+                StreamW sw
+            | tw ->
+                TextW (fun () -> tw)
+
+        new OutChannelImpl (absw)
+        :> out_channel
+        
+    let of_Stream encoding (s : Stream) =
+        new OutChannelImpl (stream_to_StreamWriter encoding s)
+        :> out_channel
+      
+let private listContains x l =
+    List.exists ((=) x) l
+
+let open_out_gen flags (_perm : int) (s : string) =
+    // permissions are ignored
+    let app = listContains Open_append flags
+
+    let access =
+        match listContains Open_rdonly flags, listContains Open_wronly flags with
+        | true, true ->
+            invalidArg "flags" "invalid access for reading"
+        | true, false ->
+            invalidArg "flags" "invalid access for writing" // FileAccess.Read 
+        | false, true ->
+            FileAccess.Write
+        | false, false ->
+            if app then FileAccess.Write
+            else FileAccess.ReadWrite
+
+    let mode =
+        match listContains Open_excl flags, app, listContains Open_creat flags, listContains Open_trunc flags with
+        | true,false,false,false ->
+            FileMode.CreateNew
+        | false,false,true,false ->
+            FileMode.Create
+        | false,false,false,false ->
+            FileMode.OpenOrCreate
+        | false,false,false,true ->
+            FileMode.Truncate
+        | false,false,true,true ->
+            FileMode.OpenOrCreate
+        | false,true,false,false ->
+            FileMode.Append
+        | _ ->
+            invalidArg "flags" "invalid mode"
+
+    let share = FileShare.Read
+    let bufferSize = 0x1000
+#if FX_NO_NONBLOCK_IO
+    let stream = new FileStream (s, mode, access, share, bufferSize)
+#else
+    let stream =
+        let allowAsync = listContains Open_nonblock flags
+        new FileStream (s, mode, access, share, bufferSize, allowAsync)
+#endif
+
+    match listContains Open_binary flags, listContains Open_text flags with
+    | true,true ->
+        invalidArg "flags" "mixed text/binary flags"
+    | true,false ->
+        new OutChannelImpl (stream_to_BinaryWriter stream )
+        :> out_channel
+    | false,_ ->
+        let encoding =
+            let encoding = List.tryPick (function Open_encoding e -> Some e | _ -> None) flags
+            defaultArg encoding defaultEncoding
+        OutChannel.of_Stream encoding (stream :> Stream)
+        
+let open_out (s : string) =
+    open_out_gen [Open_text; Open_wronly; Open_creat] 777 s
+
+// NOTE: equiv to
+//       new BinaryWriter(new FileStream(s,FileMode.OpenOrCreate,FileAccess.Write,FileShare.Read ,0x1000,false)) 
+let open_out_bin (s : string) =
+    open_out_gen [Open_binary; Open_wronly; Open_creat] 777 s
+
+
+let flush (os : out_channel) =
+    match !!os with
+    | TextW tw ->
+        // the default method does not flush, is it overriden for the console?
+        (tw()).Flush ()
+    | BinaryW bw ->
+        bw.Flush ()
+    | StreamW sw ->
+        sw.Flush ()
+
+let close_out (os : out_channel) =
+    match !!os with
+    | TextW tw ->
+        (tw ()).Close ()
+    | BinaryW bw ->
+        bw.Close ()
+    | StreamW sw ->
+        sw.Close ()
+
+let prim_output_newline (os : out_channel) =
+    match !!os with
+    | TextW tw ->
+        (tw()).WriteLine ()
+    | BinaryW _ ->
+        invalidArg "os" "the channel is a binary channel"
+    | StreamW sw ->
+        sw.WriteLine()
+
+let output_string (os : out_channel) (s : string) =
+    match !!os with
+    | TextW tw ->
+        (tw()).Write s
+    | BinaryW bw ->
+         // Write using a char array - writing a string writes it length-prefixed!
+         Array.init s.Length (fun i -> s.[i])
+         |> bw.Write
+    | StreamW sw ->
+        sw.Write s
+
+let prim_output_int (os : out_channel) (s : int) =
+    match !!os with
+    | TextW tw ->
+        (tw()).Write s
+    | BinaryW _ ->
+        invalidArg "os" "the channel is a binary channel"
+    | StreamW sw ->
+        sw.Write s
+
+let prim_output_float (os : out_channel) (s : float) =
+    match !!os with
+    | TextW tw ->
+        (tw()).Write s
+    | BinaryW _ ->
+        invalidArg "os" "the channel is a binary channel"
+    | StreamW sw ->
+        sw.Write s
+
+let output_char (os : out_channel) (c : char) =
+    match !!os with
+    | TextW tw ->
+        (tw()).Write c
+    | BinaryW bw ->
+        if int c > 255 then
+            invalidArg "c" "unicode characters of value > 255 may not be written to binary channels"
+        bw.Write (byte c)
+    | StreamW sw ->
+        sw.Write c
+
+let output_chars (os : out_channel) (c : char[]) start len  = 
+    match !!os with 
+    | TextW tw ->
+        (tw()).Write (c, start, len)
+    | BinaryW bw ->
+        bw.Write (c, start, len)
+    | StreamW sw ->
+        sw.Write (c, start, len)
+
+let seek_out (os : out_channel) (n : int) =
+    match !!os with
+    | StreamW sw -> 
+        sw.Flush ()
+        (OutChannel.to_Stream os).Seek (int64 n, SeekOrigin.Begin)
+        |> ignore
+    | TextW _ ->
+        (OutChannel.to_Stream os).Seek (int64 n, SeekOrigin.Begin)
+        |> ignore
+    | BinaryW bw ->
+        bw.Flush ()
+        bw.Seek (n, SeekOrigin.Begin) |> ignore
+//
+let pos_out (os : out_channel) =
+    flush os
+    int32 (OutChannel.to_Stream os).Position
+//
+let out_channel_length (os : out_channel) =
+    flush os
+    int32 (OutChannel.to_Stream os).Length
+
+//
+let output (os : out_channel) (buf : byte[]) (x : int) (len : int) = 
+    match !!os with
+    | BinaryW bw ->
+        bw.Write (buf, x, len)
+    | TextW _
+    | StreamW _ ->
+        output_string os (defaultEncoding.GetString (buf, x, len))
+
+//
+let output_byte (os : out_channel) (x : int) =
+    match !!os with
+    | BinaryW bw ->
+        bw.Write(byte (x % 256))
+    | TextW _
+    | StreamW _ ->
+        output_char os (char (x % 256))
+
+//
+let output_binary_int (os : out_channel) (x : int) =
+    match !!os with
+    | BinaryW bw ->
+        bw.Write x
+    | _ -> failwith "output_binary_int: not a binary stream"
+
+//
+let set_binary_mode_out (os : out_channel) b =
+    match !!os with
+    | TextW _ when b ->
+        failwith "cannot set this stream to binary mode"
+    | TextW _ -> ()
+    | StreamW _ when not b -> ()
+    | BinaryW _ when b -> ()
+    | BinaryW bw ->
+        os <--  stream_to_StreamWriter defaultEncoding (OutChannel.to_Stream os)
+    | StreamW bw ->
+        os <-- stream_to_BinaryWriter (OutChannel.to_Stream os)
+    
+
+#if FX_NO_BINARY_SERIALIZATION
+#else
+//
+let output_value (os : out_channel) (x : 'a) =
+    let formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter()
+    formatter.Serialize (OutChannel.to_Stream os, box [x])
+    flush os
+#endif
+
+//
+let (!!!) (c : in_channel) =
+    match c with
+    | :? InChannelImpl as c ->
+        c.Reader
+    | :? StreamReader as sr ->
+        StreamR sr
+    | _ ->
+        TextR (fun () -> c)
+
+//
+let (<---) (c: in_channel) r =
+    match c with
+    | :? InChannelImpl as c ->
+        c.Reader<- r
+    | _ -> failwith "the mode may only be adjusted channels created with one of the Pervasives.open_* functions"
+
+//
+let mk_BinaryReader (s: Stream) =
+    BinaryR (new BinaryReader (s))
+//
+let mk_StreamReader e (s: Stream) =
+    StreamR (new StreamReader (s, e, false))
+
+//
+module InChannel =
+    let of_Stream (e : Encoding) (s : Stream) =
+        new InChannelImpl (mk_StreamReader e s)
+        :> in_channel
+
+    let of_StreamReader w =
+        new InChannelImpl (StreamR w)
+        :> in_channel
+
+    let of_BinaryReader r =
+        new InChannelImpl (BinaryR r)
+        :> in_channel
+      
+    let of_TextReader (r : TextReader) =
+        let absr =
+            match r with
+            | :? StreamReader as sr -> StreamR sr
+            | tr -> TextR (fun () -> tr)
+        new InChannelImpl(absr) :> in_channel
+
+    let to_StreamReader (c : in_channel) =
+        match !!!c with
+        | StreamR sr -> sr
+        | _ -> failwith "to_StreamReader: cannot access a stream reader for this channel"
+      
+    let to_BinaryReader (is : in_channel) =
+        match !!!is with
+        | BinaryR sr -> sr
+        | _ -> failwith "to_BinaryReader: cannot access a binary reader for this channel"
+      
+    let to_TextReader (is : in_channel) =
+        match !!!is with
+        | TextR tr -> tr ()
+        | _ -> is
+      
+    let to_Stream (is : in_channel) =
+        match !!!is with
+        | BinaryR bw -> bw.BaseStream
+        | StreamR sw -> sw.BaseStream
+        | _ -> failwith "cannot seek, set position or calculate length of this stream"
+
+// permissions are ignored
+let open_in_gen flags (_perm : int) (s : string) =
+    let access =
+        match listContains Open_rdonly flags, listContains Open_wronly flags with
+        | true, true ->
+            invalidArg "flags" "invalid access"
+        | true, false ->
+            FileAccess.Read
+        | false, true ->
+            invalidArg "flags" "invalid access for reading"
+        | false, false ->
+            FileAccess.ReadWrite
+
+    let mode =
+        match listContains Open_excl flags, listContains Open_append flags, listContains Open_creat flags, listContains Open_trunc flags with
+        | false, false, false, false ->
+            FileMode.Open
+        | _ ->
+            invalidArg "flags" "invalid mode for reading"
+
+    let share = FileShare.Read
+    let bufferSize = 0x1000
+#if FX_NO_NONBLOCK_IO
+    let stream =
+        new FileStream(s, mode, access, share, bufferSize)
+        :> Stream
+#else
+    let stream =
+        let allowAsync = listContains Open_nonblock flags
+        new FileStream (s, mode, access, share, bufferSize, allowAsync)
+        :> Stream
+#endif
+    match listContains Open_binary flags, listContains Open_text flags with
+    | true, true ->
+        invalidArg "flags" "mixed text/binary flags specified"
+    | true, false ->
+        new InChannelImpl (mk_BinaryReader stream)
+        :> in_channel
+    | false, _ ->
+        let encoding =
+            let encoding = List.tryPick (function Open_encoding e -> Some e | _ -> None) flags
+            defaultArg encoding defaultEncoding
+        InChannel.of_Stream encoding stream
+//
+let open_in_encoded (e : Encoding) (s : string) =
+    open_in_gen [Open_text; Open_rdonly; Open_encoding e] 777 s
+//
+let open_in (s : string) =
+    open_in_gen [Open_text; Open_rdonly] 777 s
+
+// NOTE: equivalent to
+//     new BinaryReader(new FileStream(s,FileMode.Open,FileAccess.Read,FileShare.Read,0x1000,false))
+let open_in_bin (s : string) =
+    open_in_gen [Open_binary; Open_rdonly] 777 s
+
+//
+let close_in (is : in_channel) =
+    match !!!is with
+    | TextR tw -> (tw()).Close()
+    | BinaryR bw -> bw.Close()
+    | StreamR sw -> sw.Close()
+
+//
+let input_line (is : in_channel) =
+    match !!!is with
+    | BinaryR _ -> failwith "input_line: binary mode"
+    | TextR tw -> match tw().ReadLine() with null -> raise End_of_file | res -> res
+    | StreamR sw -> match sw.ReadLine() with null -> raise End_of_file | res -> res
+
+//
+let input_byte (is : in_channel) =
+    match !!!is with
+    | BinaryR bw ->  int (bw.ReadByte())
+    | TextR tr -> let b = (tr()).Read() in if b = -1 then raise End_of_file else int (byte b)
+    | StreamR sr -> let b = sr.Read() in if b = -1 then raise End_of_file else int (byte b)
+
+//
+let prim_peek (is : in_channel) =
+    match !!!is with
+    | BinaryR bw ->  bw.PeekChar()
+    | TextR tr -> (tr()).Peek()
+    | StreamR sr -> sr.Peek()
+
+//
+let prim_input_char (is : in_channel) =
+    match !!!is with
+    | BinaryR bw ->  (try int(bw.ReadByte()) with End_of_file -> -1)
+    | TextR tr -> (tr()).Read()
+    | StreamR sr -> sr.Read()
+
+//
+let input_char (is : in_channel) = 
+    match !!!is with
+    | BinaryR _ ->
+        char_of_int (input_byte is)
+    | TextR tr ->
+        let b = (tr()).Read ()
+        if b = -1 then raise End_of_file
+        else char b
+    | StreamR sr ->
+        let b = sr.Read ()
+        if b = -1 then raise End_of_file
+        else char b
+
+//
+let input_chars (is : in_channel) (buf : char[]) start len = 
+    match !!!is with
+    | BinaryR bw ->
+        bw.Read (buf, start, len)
+    | TextR trf ->
+        let tr = trf ()
+        tr.Read (buf, start, len)
+    | StreamR sr ->
+        sr.Read (buf, start, len)
+
+//
+let seek_in (is : in_channel) (n : int) =
+    match !!!is with
+    | StreamR sw ->
+        sw.DiscardBufferedData ()
+    | TextR _
+    | BinaryR _ -> ()
+
+    ignore <| (InChannel.to_Stream is).Seek (int64 n, SeekOrigin.Begin)
+
+//
+let pos_in (is : in_channel) =
+    int32 (InChannel.to_Stream is).Position
+//
+let in_channel_length (is : in_channel) =
+    int32 (InChannel.to_Stream is).Length
+
+//
+let input_bytes_from_TextReader (tr : TextReader) (enc : Encoding) (buf : byte[]) (x : int) (len : int) = 
+    /// Don't read too many characters!
+    let lenc = (len * 99) / enc.GetMaxByteCount (100)
+    let charbuf : char[] = Array.zeroCreate lenc
+    let nRead = tr.Read (charbuf, x, lenc)
+    let count = enc.GetBytes (charbuf, x, nRead, buf, x)
+    count
+
+//
+let input (is : in_channel) (buf : byte[]) (x : int) (len : int) = 
+    match !!!is with
+    | StreamR _ ->
+        (InChannel.to_Stream is).Read (buf, x, len)
+    | TextR trf ->
+        input_bytes_from_TextReader (trf ()) defaultEncoding buf x len
+    | BinaryR br ->
+        br.Read (buf, x, len)
+
+//
+let really_input (is : in_channel) (buf : byte[]) (x : int) (len : int) =
+    let mutable n = 0
+    let mutable i = 1
+    // while i > 0 && n < len do
+    while (if i > 0 then n < len else false) do
+        i <- input is buf (x + n) (len - n)
+        n <- n + i
+
+//
+let unsafe_really_input (is : in_channel) buf x len =
+    really_input is buf x len
+//
+let input_binary_int (is : in_channel) =
+    match !!!is with
+    | BinaryR bw ->
+        bw.ReadInt32 ()
+    | _ ->
+        failwith "input_binary_int: not a binary stream"
+
+//
+let set_binary_mode_in (is : in_channel) b =
+    match !!!is with
+    | TextR _ when b ->
+        failwith "set_binary_mode_in: cannot set this stream to binary mode"
+    | TextR _ -> ()
+    | StreamR _ when not b -> ()
+    | BinaryR _ when b -> ()
+    | BinaryR bw ->
+        is <---  mk_StreamReader defaultEncoding (InChannel.to_Stream is)
+    | StreamR bw ->
+        is <--- mk_BinaryReader (InChannel.to_Stream is)
+
+(*
+#if FX_NO_BINARY_SERIALIZATION
+#else
+let input_value (is:in_channel) = 
+    let formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter() 
+    let res = formatter.Deserialize(InChannel.to_Stream is) 
+    match ((unbox res) : 'a list) with 
+    | [x] -> x
+    | _ -> failwith "input_value: expected one item"
+#endif
+
+type InChannelImpl with 
+    override x.Dispose(deep:bool) = if deep then close_in (x :> in_channel)
+    override x.Peek() = prim_peek (x :> in_channel) 
+    override x.Read() = prim_input_char (x :> in_channel) 
+    override x.Read((buffer:char[]),(index:int),(count:int)) = input_chars (x :> in_channel) buffer index count
+    
+
+type OutChannelImpl with 
+    override x.Dispose(deep:bool) = if deep then close_out (x :> out_channel)
+    override x.Encoding = x.TextWriter.Encoding
+    override x.FormatProvider = x.TextWriter.FormatProvider
+    override x.NewLine = x.TextWriter.NewLine
+    override x.Write(s:string) = output_string (x :> out_channel) s
+    override x.Write(c:char) = output_char (x :> out_channel) c
+    override x.Write(c:char[]) = output_chars (x :> out_channel) c 0 c.Length
+    override x.Write((c:char[]),(index:int),(count:int)) = output_chars (x :> out_channel) c index count
+*)
 
 (* Output functions on standard output *)
 
+
 /// Print a character on standard output.
 let print_char (c : char) : unit =
-    raise <| System.NotImplementedException "print_char"
+    output_char stdout c
 
 /// Print a string on standard output.
 let print_string (str : string) : unit =
-    raise <| System.NotImplementedException "print_string"
+    output_string stdout str
 
 /// Print an integer, in decimal, on standard output.
 let print_int (value : int) : unit =
-    raise <| System.NotImplementedException "print_int"
+    prim_output_int stdout value
 
 /// Print a floating-point number, in decimal, on standard output.
 let print_float (value : float) : unit =
-    raise <| System.NotImplementedException "print_float"
-
-/// Print a string, followed by a newline character,
-/// on standard output and flush standard output.
-let print_endline (str : string) : unit =
-    raise <| System.NotImplementedException "print_endline"
+    prim_output_float stdout value
 
 /// Print a newline character on standard output, and flush standard output.
 /// This can be used to simulate line buffering of standard output.
 let print_newline () : unit =
-    raise <| System.NotImplementedException "print_newline"
+    prim_output_newline stdout
+
+/// Print a string, followed by a newline character,
+/// on standard output and flush standard output.
+let print_endline (str : string) : unit =
+    print_string str
+    print_newline ()
 
 
 (* Output functions on standard error *)
 
 /// Print a character on standard error.
 let prerr_char (c : char) : unit =
-    raise <| System.NotImplementedException "prerr_char"
+    output_char stderr c
 
 /// Print a string on standard error.
 let prerr_string (str : string) : unit =
-    raise <| System.NotImplementedException "prerr_string"
+    output_string stderr str
 
 /// Print an integer, in decimal, on standard error.
 let prerr_int (value : int) : unit =
-    raise <| System.NotImplementedException "prerr_int"
+    prim_output_int stderr value
 
 /// Print a floating-point number, in decimal, on standard error.
 let prerr_float (value : float) : unit =
-    raise <| System.NotImplementedException "prerr_float"
-
-/// Print a string, followed by a newline character,
-/// on standard error and flush standard error.
-let prerr_endline (str : string) : unit =
-    raise <| System.NotImplementedException "prerr_endline"
+    prim_output_float stderr value
 
 /// Print a newline character on standard error, and flush standard error.
 /// This can be used to simulate line buffering of standard error.
 let prerr_newline () : unit =
-    raise <| System.NotImplementedException "prerr_newline"
+    prim_output_newline stderr
+
+/// Print a string, followed by a newline character,
+/// on standard error and flush standard error.
+let prerr_endline (str : string) : unit =
+    prerr_string str
+    prerr_newline ()
 
 
 (* Input functions on standard input *)
@@ -397,18 +1129,17 @@ let prerr_newline () : unit =
 /// Flush standard output, then read characters from standard input until a newline character is encountered.
 /// Return the string of all characters read, without the newline character at the end.
 let read_line () : string =
-    raise <| System.NotImplementedException "read_line"
+    stdout.Flush ()
+    input_line stdin
 
 /// Flush standard output, then read one line from standard input and convert it to an integer.
 let read_int () : int =
-    // Preconditions
-    // TODO : Raise Failure "int_of_string" if the line read is not a valid representation of an integer.
-    raise <| System.NotImplementedException "read_int"
+    int_of_string (read_line ())
 
 /// Flush standard output, then read one line from standard input and convert it to a floating-point number.
 /// The result is unspecified if the line read is not a valid representation of a floating-point number.
 let read_float () : float =
-    raise <| System.NotImplementedException "read_float"
+    float_of_string (read_line ())
 
 
 (* General output functions *)
@@ -421,7 +1152,6 @@ let read_float () : float =
 
 (* Operations on large files *)
 
-(*
 /// <summary>Operations on large files.</summary>
 /// <remarks>This sub-module provides 64-bit variants of the channel functions that manipulate
 /// file positions and file sizes. By representing positions and sizes by 64-bit integers
@@ -451,7 +1181,7 @@ module LargeFile =
     //
     let in_channel_length (channel : in_channel) : int64 =
         raise <| System.NotImplementedException "LargeFile.in_channel_length"
-*)
+
 
 (*** References ***)
 
@@ -466,6 +1196,8 @@ type format<'a, 'b, 'c> = Microsoft.FSharp.Core.Format<'a, 'b, 'c, 'c>
 
 
 (*** Program termination ***)
+
+//exception Exit
 
 /// Contains internal, mutable state representing actions to be performed
 /// upon program termination (either normally or because of an uncaught exception).
@@ -507,6 +1239,8 @@ module private ExitCallbacks =
         exitFunctions <- f :: exitFunctions
 
 
+#if FX_NO_EXIT
+#else
 /// <summary>Terminate the process, returning the given status code to the operating system:
 /// usually 0 to indicate no errors, and a small positive integer to indicate failure.</summary>
 /// <remarks><para>All open output channels are flushed with <see cref="flush_all"/>.</para>
@@ -514,7 +1248,11 @@ module private ExitCallbacks =
 /// normally. An implicit <c>exit 2</c> is performed if the program terminates
 /// early because of an uncaught exception.</para></remarks>
 let exit (exitCode : int) =
-    raise <| System.NotImplementedException ()
+    // TODO : Implement implicit flushing of output channels
+    // TODO : Add handlers which perform an implicit 'exit 0' or 'exit 2' depending
+    // on how the program terminates.
+    Operators.exit exitCode
+#endif
 
 /// <summary>Register the given function to be called at program termination time.</summary>
 /// <remarks><para>The functions registered with <see cref="at_exit"/> will be called when
@@ -526,9 +1264,7 @@ let at_exit (f : unit -> unit) : unit =
     ExitCallbacks.at_exit f
 
 
-
 (*
-
 exception Match_failure = Microsoft.FSharp.Core.MatchFailureException
 exception Assert_failure of string * int * int 
 
@@ -549,16 +1285,12 @@ let invalid_arg s = raise (System.ArgumentException(s))
 
 let not_found() = raise Not_found
 
-
-
 let int_neg (x:int) = -x
-let inline (.())   (arr: _[]) n = arr.[n]
+let inline (.()) (arr: _[]) n = arr.[n]
 let inline (.()<-) (arr: _[]) n x = arr.[n] <- x
 
 let succ (x:int) = x + 1
 let pred (x:int) = x - 1
-let max_int = 0x7FFFFFFF // 2147483647 
-let min_int = 0x80000000 // -2147483648 
 
 (*  mod_float x y = x - y * q where q = truncate(a/b) and truncate x removes fractional part of x *)
 let truncate (x:float) : int = int32 x
@@ -573,555 +1305,15 @@ let truncatef (x:float) =
 let truncatef (x:float) = System.Math.Truncate x
 #endif
 
-let string_of_bool b = if b then "true" else "false"
-let bool_of_string s = 
-  match s with 
-  | "true" -> true 
-  | "false" -> false
-  | _ -> raise (System.ArgumentException("bool_of_string"))
-
 let string_of_int (x:int) = x.ToString()
 let int_of_string (s:string) = try int32 s with _ -> failwith "int_of_string"
-let string_of_float (x:float) = x.ToString()
-let float_of_string (s:string) = try float s with _ -> failwith "float_of_string"
 let string_to_int   x = int_of_string x
+*)
 
 
-//--------------------------------------------------------------------------
-// I/O
-//
-// OCaml-compatible channels conflate binary and text IO. It is very inconvenient to introduce
-// out_channel as a new abstract type, as this means functions like fprintf can't be used in 
-// conjunction with TextWriter values.  Hence we pretend that OCaml channels are TextWriters, and 
-// implement TextWriters in such a way the the implementation contains an optional binary stream
-// which is utilized by the OCaml binary I/O methods.
-//
-// Notes on the implementation: We discriminate between three kinds of 
-// readers/writers since various operations are possible on each kind.
-// StreamReaders/StreamWriters inherit from text readers/writers and
-// thus support more functionality.  We could just support two 
-// constructors (Binary and Text) and use dynamic type tests on the underlying .NET
-// objects to detect the cases where we have StreamWriters.
-//--------------------------------------------------------------------------
-open System.Text
-open System.IO
-
-type writer = 
-  | StreamW of StreamWriter
-  | TextW of (unit -> TextWriter)
-  | BinaryW of BinaryWriter
-
-
-[<assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", Scope="member", Target="Internal.Utilities.Pervasives+OutChannelImpl.#.ctor(Internal.Utilities.Pervasives+writer)", MessageId="System.IO.TextWriter.#ctor")>]
-do()
-
-let defaultEncoding =
-#if FX_NO_DEFAULT_ENCODING
-        // default encoding on Silverlight is UTF8 (to aling with e.g. System.IO.StreamReader)
-        Encoding.UTF8
-#else
-        Encoding.Default
-#endif
-
-type out_channel = TextWriter
-type OutChannelImpl(w: writer) = 
-    inherit TextWriter()
-    let mutable writer = w
-    member x.Writer with get() = writer and set(w) = writer <- w
-    
-    member x.Stream = 
-        match writer with 
-        | TextW _ -> failwith "cannot access a stream for this channel"
-        | BinaryW bw -> bw.BaseStream 
-        | StreamW sw -> sw.BaseStream
-    member x.TextWriter = 
-        match writer with 
-        | StreamW sw -> (sw :> TextWriter)
-        | TextW tw -> tw()
-        | _ -> failwith "binary channels created using the OCaml-compatible Pervasives.open_out_bin cannot be used as TextWriters.  Consider using 'System.IO.BinaryWriter' in preference to creating channels using open_out_bin."
-        
-    member x.StreamWriter = 
-        match writer with 
-        | StreamW sw -> sw
-        | _ -> failwith "cannot access a stream writer for this channel"
-    member x.BinaryWriter = 
-        match writer with 
-        | BinaryW w -> w
-        | _ -> failwith "cannot access a binary writer for this channel"
-
-type open_flag =
-  | Open_rdonly | Open_wronly | Open_append
-  | Open_creat | Open_trunc | Open_excl
-  | Open_binary | Open_text 
-#if FX_NO_NONBLOCK_IO
-#else
-  | Open_nonblock
-#endif
-  | Open_encoding of Encoding
-
-type reader = 
-  | StreamR of StreamReader
-  | TextR of (unit -> TextReader)
-  | BinaryR of BinaryReader
-
-/// See OutChannelImpl
-type in_channel = System.IO.TextReader
-type InChannelImpl(r : reader) = 
-    inherit TextReader()
-    let mutable reader = r
-    member x.Reader with get() = reader and set(r) = reader <- r
-    
-    member x.Stream =
-        match reader with 
-        | TextR _ -> failwith "cannot access a stream for this channel"
-        | BinaryR bw -> bw.BaseStream 
-        | StreamR sw -> sw.BaseStream
-    member x.TextReader = 
-        match reader with 
-        | StreamR sw -> (sw :> TextReader)
-        | TextR tw -> tw()
-        | _ -> failwith "binary channels created using the OCaml-compatible Pervasives.open_in_bin cannot be used as TextReaders  If necessary use the OCaml compatible binary input methods Pervasvies.input etc. to read from this channel. Consider using 'System.IO.BinaryReader' in preference to channels created using open_in_bin."
-        
-    member x.StreamReader = 
-        match reader with 
-        | StreamR sw -> sw
-        | _ -> failwith "cannot access a stream writer for this channel"
-    member x.BinaryReader = 
-        match reader with 
-        | BinaryR w -> w
-        | _ -> failwith "cannot access a binary writer for this channel"
-
-let (!!) (os : out_channel) = 
-    match os with 
-    | :? OutChannelImpl as os -> os.Writer
-    | :? StreamWriter as sw -> StreamW sw
-    | _ -> TextW (fun () -> os)
-let (<--) (os: out_channel) os' = 
-    match os with 
-    | :? OutChannelImpl as os -> os.Writer <- os'
-    | _ -> failwith "the mode may not be adjusted on a writer not created with one of the Pervasives.open_* functions"
-    
-let stream_to_BinaryWriter s    = BinaryW (new BinaryWriter(s))
-let stream_to_StreamWriter (encoding : Encoding) (s : Stream) =   StreamW (new StreamWriter(s,encoding))
-
-module OutChannel = 
-    let to_Stream (os:out_channel) =
-      match !!os with 
-      | BinaryW bw -> bw.BaseStream 
-      | StreamW sw -> sw.BaseStream
-      | TextW _ -> failwith "to_Stream: cannot access a stream for this channel"
-      
-    let to_StreamWriter (os:out_channel) =
-      match !!os with 
-      | StreamW sw -> sw
-      | _ -> failwith "to_StreamWriter: cannot access a stream writer for this channel"
-      
-    let to_TextWriter (os:out_channel) =
-      match !!os with 
-      | StreamW sw -> (sw :> TextWriter)
-      | TextW tw -> tw()
-      | _ -> os
-      
-    let of_StreamWriter w =
-      new OutChannelImpl(StreamW(w)) :> out_channel
-
-    let to_BinaryWriter (os:out_channel) =
-      match !!os with 
-      | BinaryW bw -> bw
-      | _ -> failwith "to_BinaryWriter: cannot access a binary writer for this channel"
-      
-    let of_BinaryWriter w =
-      new OutChannelImpl(BinaryW w) :> out_channel
-      
-    let of_TextWriter (w:TextWriter) =
-      let absw = 
-        match w with 
-        | :? StreamWriter as sw -> StreamW sw
-        | tw -> TextW (fun () -> tw) in
-      new OutChannelImpl(absw) :> out_channel
-        
-    let of_Stream encoding (s : Stream) =   new OutChannelImpl(stream_to_StreamWriter encoding s) :> out_channel
-      
-let listContains x l = List.exists (fun y -> x = y) l
-
-let open_out_gen flags (_perm:int) (s:string) = 
-    // permissions are ignored 
-    let app = listContains Open_append flags in 
-    let access = 
-        match listContains Open_rdonly flags, listContains Open_wronly flags with
-        | true, true -> invalidArg "flags" "invalid access for reading"
-        | true, false -> invalidArg "flags" "invalid access for writing" // FileAccess.Read 
-        | false, true ->  FileAccess.Write
-        | false, false -> (if app then FileAccess.Write else FileAccess.ReadWrite)  
-    let mode =
-        match (listContains Open_excl flags,app, listContains Open_creat flags, listContains Open_trunc flags) with
-        | (true,false,false,false) -> FileMode.CreateNew
-        | false,false,true,false -> FileMode.Create
-        | false,false,false,false -> FileMode.OpenOrCreate
-        | false,false,false,true -> FileMode.Truncate
-        | false,false,true,true -> FileMode.OpenOrCreate
-        | false,true,false,false -> FileMode.Append
-        | _ -> invalidArg "flags" "invalid mode" 
-    let share = FileShare.Read 
-    let bufferSize = 0x1000 
-#if FX_NO_NONBLOCK_IO
-    let stream = (new FileStream(s,mode,access,share,bufferSize)) 
-#else
-    let allowAsync = listContains Open_nonblock flags 
-    let stream = (new FileStream(s,mode,access,share,bufferSize,allowAsync)) 
-#endif
-    match listContains Open_binary flags, listContains Open_text flags with 
-    | true,true -> invalidArg "flags" "mixed text/binary flags"
-    | true,false -> (new OutChannelImpl(stream_to_BinaryWriter stream ) :> out_channel)
-    | false,_ ->
-        let encoding = List.tryPick (function Open_encoding e -> Some(e) | _ -> None) flags 
-        let encoding = match encoding with None -> defaultEncoding | Some e -> e 
-        OutChannel.of_Stream encoding (stream :> Stream)
-        
-let open_out (s:string) = open_out_gen [Open_text; Open_wronly; Open_creat] 777 s
-
-// NOTE: equiv to
-//       new BinaryWriter(new FileStream(s,FileMode.OpenOrCreate,FileAccess.Write,FileShare.Read ,0x1000,false)) 
-let open_out_bin (s:string) = open_out_gen [Open_binary; Open_wronly; Open_creat] 777 s
-
-
-let flush (os:out_channel) = 
-    match !!os with 
-    | TextW tw   -> (tw()).Flush() // the default method does not flush, is it overriden for the console? 
-    | BinaryW bw -> bw.Flush()
-    | StreamW sw -> sw.Flush()
-
-let close_out (os:out_channel) = 
-    match !!os with 
-    | TextW tw -> (tw()).Close()
-    | BinaryW bw -> bw.Close()
-    | StreamW sw -> sw.Close()
-
-let prim_output_newline (os:out_channel) = 
-    match !!os with 
-    | TextW tw -> (tw()).WriteLine()
-    | BinaryW _ -> invalidArg "os" "the channel is a binary channel"
-    | StreamW sw -> sw.WriteLine()
-
-let output_string (os:out_channel) (s:string) = 
-    match !!os with 
-    | TextW tw -> (tw()).Write(s)
-    | BinaryW bw -> 
-         // Write using a char array - writing a string writes it length-prefixed! 
-         bw.Write (Array.init s.Length (fun i -> s.[i]) )
-    | StreamW sw -> sw.Write(s)
-
-let prim_output_int (os:out_channel) (s:int) = 
-    match !!os with 
-    | TextW tw -> (tw()).Write(s)
-    | BinaryW _ -> invalidArg "os" "the channel is a binary channel"
-    | StreamW sw -> sw.Write(s)
-
-let prim_output_float (os:out_channel) (s:float) = 
-    match !!os with 
-    | TextW tw -> (tw()).Write(s)
-    | BinaryW _ -> invalidArg "os" "the channel is a binary channel"
-    | StreamW sw -> sw.Write(s)
-
-let output_char (os:out_channel) (c:char) = 
-    match !!os with 
-    | TextW tw -> 
-        (tw()).Write(c)
-    | BinaryW bw -> 
-        if int c > 255 then invalidArg "c" "unicode characters of value > 255 may not be written to binary channels"
-        bw.Write(byte c)
-    | StreamW sw -> 
-        sw.Write(c)
-
-let output_chars (os:out_channel) (c:char[]) start len  = 
-    match !!os with 
-    | TextW tw -> (tw()).Write(c,start,len)
-    | BinaryW bw -> bw.Write(c,start,len)
-    | StreamW sw -> sw.Write(c,start,len)
-
-let seek_out (os:out_channel) (n:int) = 
-    match !!os with 
-    | StreamW sw -> 
-        sw.Flush();   
-        (OutChannel.to_Stream os).Seek(int64 n,SeekOrigin.Begin) |> ignore
-    | TextW _ ->
-        (OutChannel.to_Stream os).Seek(int64 n,SeekOrigin.Begin) |> ignore
-    | BinaryW bw -> 
-        bw.Flush();
-        bw.Seek(n,SeekOrigin.Begin) |> ignore
-
-let pos_out (os:out_channel) = flush os; int32 ((OutChannel.to_Stream os).Position)
-let out_channel_length (os:out_channel) = flush os; int32 ((OutChannel.to_Stream os).Length)
-
-let output (os:out_channel) (buf: byte[]) (x:int) (len: int) = 
-    match !!os with 
-    | BinaryW bw -> bw.Write(buf,x,len)
-    | TextW _ | StreamW _ -> 
-        output_string os (defaultEncoding.GetString(buf,x,len))
-
-let output_byte (os:out_channel) (x:int) = 
-    match !!os with 
-    | BinaryW bw -> bw.Write(byte (x % 256))
-    | TextW _  | StreamW _ -> output_char os (char (x % 256))
-
-let output_binary_int (os:out_channel) (x:int) = 
-    match !!os with 
-    | BinaryW bw -> bw.Write x
-    | _ -> failwith "output_binary_int: not a binary stream"
-
-let set_binary_mode_out (os:out_channel) b = 
-    match !!os with 
-    | StreamW _ when not b -> ()
-    | BinaryW _ when b -> ()
-    | BinaryW bw -> 
-            os <--  stream_to_StreamWriter defaultEncoding (OutChannel.to_Stream os)
-    | StreamW bw -> os <-- stream_to_BinaryWriter (OutChannel.to_Stream os)
-    | TextW _ when b -> failwith "cannot set this stream to binary mode"
-    | TextW _ -> ()
-
-let print_int (x:int)        = prim_output_int stdout x
-let print_float (x:float)    = prim_output_float stdout x
-let print_string (x:string)  = output_string stdout x
-let print_newline ()         = prim_output_newline stdout
-let print_endline (x:string) = print_string x; print_newline ()
-let print_char (c:char)      = output_char stdout c
-
-let prerr_int (x:int)        = prim_output_int stderr x
-let prerr_float (x:float)    = prim_output_float stderr x
-let prerr_string (x:string)  = output_string stderr x
-let prerr_newline ()         = prim_output_newline stderr
-let prerr_endline (x:string) = prerr_string x; prerr_newline ()
-let prerr_char (c:char)      = output_char stderr c
-
-#if FX_NO_BINARY_SERIALIZATION
-#else
-let output_value (os:out_channel) (x: 'a) = 
-    let formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter() 
-    formatter.Serialize(OutChannel.to_Stream os,box [x]);
-    flush os
-#endif
-
-let (!!!) (c : in_channel) = 
-    match c with 
-    | :? InChannelImpl as c -> c.Reader
-    | :? StreamReader as sr -> StreamR sr
-    | _ -> TextR (fun () -> c)
-let (<---) (c: in_channel) r = 
-    match c with 
-    | :? InChannelImpl as c -> c.Reader<- r
-    | _ -> failwith "the mode may only be adjusted channels created with one of the Pervasives.open_* functions"
-
-let mk_BinaryReader (s: Stream) = BinaryR (new BinaryReader(s))
-let mk_StreamReader e (s: Stream) = StreamR (new StreamReader(s, e,false))
-module InChannel = 
-
-    let of_Stream (e:Encoding) (s: Stream) =   new InChannelImpl(mk_StreamReader e s) :> in_channel
-    let of_StreamReader w =
-      new InChannelImpl (StreamR w) :> in_channel
-
-    let of_BinaryReader r =
-      new InChannelImpl (BinaryR r) :> in_channel
-      
-    let of_TextReader (r: TextReader) =
-      let absr = 
-        match r with 
-        | :? StreamReader as sr -> StreamR sr
-        | tr -> TextR (fun () -> tr) 
-      new InChannelImpl(absr) :> in_channel
-
-    let to_StreamReader (c:in_channel) =
-      match !!!c with 
-      | StreamR sr -> sr
-      | _ -> failwith "to_StreamReader: cannot access a stream reader for this channel"
-      
-    let to_BinaryReader (is:in_channel) =
-      match !!!is with 
-      | BinaryR sr -> sr
-      | _ -> failwith "to_BinaryReader: cannot access a binary reader for this channel"
-      
-    let to_TextReader (is:in_channel) =
-      match !!!is with 
-      | TextR tr ->tr()
-      | _ -> is
-      
-    let to_Stream (is:in_channel) =
-      match !!!is with 
-      | BinaryR bw -> bw.BaseStream
-      | StreamR sw -> sw.BaseStream
-      | _ -> failwith "cannot seek, set position or calculate length of this stream"
-
-// permissions are ignored 
-let open_in_gen flags (_perm:int) (s:string) = 
-    let access = 
-      match listContains Open_rdonly flags, listContains Open_wronly flags with
-      | true, true -> invalidArg "flags" "invalid access"
-      | true, false -> FileAccess.Read 
-      | false, true -> invalidArg "flags" "invalid access for reading"
-      | false, false -> FileAccess.ReadWrite 
-    let mode = 
-      match listContains Open_excl flags,listContains Open_append flags, listContains Open_creat flags, listContains Open_trunc flags with
-      | false,false,false,false -> FileMode.Open
-      | _ -> invalidArg "flags" "invalid mode for reading" 
-    let share = FileShare.Read 
-    let bufferSize = 0x1000 
-#if FX_NO_NONBLOCK_IO
-    let stream = new FileStream(s,mode,access,share,bufferSize) :> Stream 
-#else
-    let allowAsync = listContains Open_nonblock flags 
-    let stream = new FileStream(s,mode,access,share,bufferSize,allowAsync) :> Stream 
-#endif
-    match listContains Open_binary flags, listContains Open_text flags with 
-    | true,true -> invalidArg "flags" "mixed text/binary flags specified"
-    | true,false -> new InChannelImpl (mk_BinaryReader stream ) :> in_channel
-    | false,_ ->
-        let encoding = List.tryPick (function Open_encoding e -> Some(e) | _ -> None) flags 
-        let encoding = match encoding with None -> defaultEncoding | Some e -> e 
-        InChannel.of_Stream encoding stream
-  
-let open_in_encoded (e:Encoding) (s:string) = open_in_gen [Open_text; Open_rdonly; Open_encoding e] 777 s
-let open_in (s:string) = open_in_gen [Open_text; Open_rdonly] 777 s
-
-// NOTE: equivalent to
-//     new BinaryReader(new FileStream(s,FileMode.Open,FileAccess.Read,FileShare.Read,0x1000,false))
-let open_in_bin (s:string) = open_in_gen [Open_binary; Open_rdonly] 777 s
-
-let close_in (is:in_channel) = 
-  match !!!is with 
-  | TextR tw -> (tw()).Close()
-  | BinaryR bw -> bw.Close()
-  | StreamR sw -> sw.Close()
-
-let input_line (is:in_channel) = 
-    match !!!is with 
-    | BinaryR _ -> failwith "input_line: binary mode"
-    | TextR tw -> match tw().ReadLine() with null -> raise End_of_file | res -> res
-    | StreamR sw -> match sw.ReadLine() with null -> raise End_of_file | res -> res
-
-let input_byte (is:in_channel) = 
-    match !!!is with 
-    | BinaryR bw ->  int (bw.ReadByte())
-    | TextR tr -> let b = (tr()).Read() in if b = -1 then raise End_of_file else int (byte b)
-    | StreamR sr -> let b = sr.Read() in if b = -1 then raise End_of_file else int (byte b)
-
-let prim_peek (is:in_channel) = 
-    match !!!is with 
-    | BinaryR bw ->  bw.PeekChar()
-    | TextR tr -> (tr()).Peek()
-    | StreamR sr -> sr.Peek()
-
-let prim_input_char (is:in_channel) = 
-    match !!!is with 
-    | BinaryR bw ->  (try int(bw.ReadByte()) with End_of_file -> -1)
-    | TextR tr -> (tr()).Read() 
-    | StreamR sr -> sr.Read()
-
-let input_char (is:in_channel) = 
-    match !!!is with 
-    | BinaryR _ ->  char_of_int (input_byte is)
-    | TextR tr -> let b = (tr()).Read() in if b = -1 then raise End_of_file else (char b)
-    | StreamR sr -> let b = sr.Read() in if b = -1 then raise End_of_file else (char b)
-
-let input_chars (is:in_channel) (buf:char[]) start len = 
-    match !!!is with 
-    | BinaryR bw ->  bw.Read(buf,start,len)
-    | TextR trf -> let tr = trf() in tr.Read(buf,start,len) 
-    | StreamR sr -> sr.Read(buf,start,len) 
-
-let seek_in (is:in_channel) (n:int) = 
-    begin match !!!is with 
-    | StreamR sw -> sw.DiscardBufferedData() 
-    | TextR _ | BinaryR _ -> ()
-    end;
-    ignore ((InChannel.to_Stream is).Seek(int64 n,SeekOrigin.Begin))
-
-let pos_in (is:in_channel)  = int32 ((InChannel.to_Stream is).Position)
-let in_channel_length (is:in_channel)  = int32 ((InChannel.to_Stream is).Length)
-
-let input_bytes_from_TextReader (tr : TextReader) (enc : Encoding) (buf: byte[]) (x:int) (len: int) = 
-    /// Don't read too many characters!
-    let lenc = (len * 99) / enc.GetMaxByteCount(100) 
-    let charbuf : char[] = Array.zeroCreate lenc 
-    let nRead = tr.Read(charbuf,x,lenc) 
-    let count = enc.GetBytes(charbuf,x,nRead,buf,x) 
-    count
-
-let input (is: in_channel) (buf: byte[]) (x:int) (len: int) = 
-    match !!!is with 
-    | StreamR _  ->  (InChannel.to_Stream is).Read(buf,x,len)
-    | TextR trf   -> 
-        input_bytes_from_TextReader (trf()) defaultEncoding buf x len  
-    | BinaryR br -> br.Read(buf,x,len)
-
-let really_input (is:in_channel) (buf: byte[]) (x:int) (len: int) = 
-    let mutable n = 0 
-    let mutable i = 1 
-    while (if i > 0 then n < len else false) do 
-        i <- input is buf (x+n) (len-n);
-        n <- n + i
-    
-let unsafe_really_input (is:in_channel) buf x len = really_input is buf x len
-
-let input_binary_int (is:in_channel) = 
-    match !!!is with 
-    | BinaryR bw -> bw.ReadInt32()
-    | _ -> failwith "input_binary_int: not a binary stream"
-
-let set_binary_mode_in (is:in_channel) b = 
-    match !!!is with 
-    | StreamR _ when not b -> ()
-    | BinaryR _ when b -> ()
-    | BinaryR bw -> is <---  mk_StreamReader defaultEncoding (InChannel.to_Stream is)
-    | StreamR bw -> is <--- mk_BinaryReader (InChannel.to_Stream is)
-    | TextR _ when b -> failwith "set_binary_mode_in: cannot set this stream to binary mode"
-    | TextR _ -> ()
-
-let read_line ()  = stdout.Flush(); input_line stdin
-let read_int ()   = int_of_string (read_line())
-let read_float () = float_of_string (read_line ())
-
-#if FX_NO_BINARY_SERIALIZATION
-#else
-let input_value (is:in_channel) = 
-    let formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter() 
-    let res = formatter.Deserialize(InChannel.to_Stream is) 
-    match ((unbox res) : 'a list) with 
-    | [x] -> x
-    | _ -> failwith "input_value: expected one item"
-#endif
-
-type InChannelImpl with 
-    override x.Dispose(deep:bool) = if deep then close_in (x :> in_channel)
-    override x.Peek() = prim_peek (x :> in_channel) 
-    override x.Read() = prim_input_char (x :> in_channel) 
-    override x.Read((buffer:char[]),(index:int),(count:int)) = input_chars (x :> in_channel) buffer index count
-    
-
-type OutChannelImpl with 
-    override x.Dispose(deep:bool) = if deep then close_out (x :> out_channel)
-    override x.Encoding = x.TextWriter.Encoding
-    override x.FormatProvider = x.TextWriter.FormatProvider
-    override x.NewLine = x.TextWriter.NewLine
-    override x.Write(s:string) = output_string (x :> out_channel) s
-    override x.Write(c:char) = output_char (x :> out_channel) c
-    override x.Write(c:char[]) = output_chars (x :> out_channel) c 0 c.Length
-    override x.Write((c:char[]),(index:int),(count:int)) = output_chars (x :> out_channel) c index count
-    
-
-
-exception Exit
-
-
+(*
 module Pervasives = 
-
     let hash  (x: 'a) = LanguagePrimitives.GenericHash x
-
-#if FX_NO_EXIT
-#else
-    let exit (n:int) = Operators.exit n
-#endif
-
     let invalid_arg s = raise (System.ArgumentException(s))
-
-
 *)
 

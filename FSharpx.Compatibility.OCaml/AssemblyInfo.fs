@@ -11,6 +11,7 @@
 module internal AssemblyInfo
 
 open System
+open System.Diagnostics.CodeAnalysis
 open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
@@ -32,5 +33,12 @@ open System.Security.Permissions
 #else
 [<assembly: Dependency("FSharp.Core", LoadHint.Always)>] 
 #endif
+
+[<assembly: SuppressMessage(
+    "Microsoft.Globalization",
+    "CA1305:SpecifyIFormatProvider",
+    Scope = "member",
+    Target = "Internal.Utilities.Pervasives+OutChannelImpl.#.ctor(Internal.Utilities.Pervasives+writer)",
+    MessageId = "System.IO.TextWriter.#ctor")>]
 
 do ()
