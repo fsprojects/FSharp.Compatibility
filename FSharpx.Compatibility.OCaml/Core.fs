@@ -99,4 +99,53 @@ module ExnPatterns =
         | _ ->
             None
 
+(*
+exception Match_failure = Microsoft.FSharp.Core.MatchFailureException
+exception Assert_failure of string * int * int 
+
+exception Undefined 
+
+exception End_of_file      = System.IO.EndOfStreamException
+exception Out_of_memory    = System.OutOfMemoryException
+exception Division_by_zero = System.DivideByZeroException
+exception Stack_overflow   = System.StackOverflowException
+
+let Not_found<'a> = (new KeyNotFoundException("The item was not found during a search or in a collection") :> exn)
+let (|Not_found|_|) (inp:exn) = match inp with :? KeyNotFoundException -> Some() | _ -> None
+
+let Invalid_argument (msg:string) = (new System.ArgumentException(msg) :> exn)
+let (|Invalid_argument|_|) (inp:exn) = match inp with :? System.ArgumentException as e -> Some(e.Message) | _ -> None
+
+let invalid_arg s = raise (System.ArgumentException(s))
+
+let not_found() = raise Not_found
+
+let int_neg (x:int) = -x
+let inline (.()) (arr: _[]) n = arr.[n]
+let inline (.()<-) (arr: _[]) n x = arr.[n] <- x
+
+(*  mod_float x y = x - y * q where q = truncate(a/b) and truncate x removes fractional part of x *)
+let truncate (x:float) : int = int32 x
+
+#if FX_NO_TRUNCATE
+let truncatef (x:float) = 
+    if x >= 0.0 then 
+        System.Math.Floor x
+    else
+        System.Math.Ceiling x
+#else
+let truncatef (x:float) = System.Math.Truncate x
+#endif
+
+let string_of_int (x:int) = x.ToString()
+let int_of_string (s:string) = try int32 s with _ -> failwith "int_of_string"
+let string_to_int   x = int_of_string x
+*)
+
+
+(*
+module Pervasives = 
+    let hash  (x: 'a) = LanguagePrimitives.GenericHash x
+    let invalid_arg s = raise (System.ArgumentException(s))
+*)
 

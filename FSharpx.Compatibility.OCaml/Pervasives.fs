@@ -53,12 +53,10 @@ let inline ( != ) x y =
 // NOTE : The 'not', (&&), and (||) operators are already
 // provided in the F# Core Library (FSharp.Core).
 
-//
 [<Obsolete("Deprecated. The (&&) operator should be used instead.")>]
 let inline (&) (x : bool) (y : bool) =
     x && y
 
-//
 [<Obsolete("Deprecated. The (||) operator should be used instead.")>]
 let inline (or) (x : bool) (y : bool) =
     x || y
@@ -66,7 +64,14 @@ let inline (or) (x : bool) (y : bool) =
 
 (*** Integer arithmetic ***)
 
-/// Integer remainder. If y is not zero, the result of x mod y satisfies the following properties: x = (x / y) * y + x mod y and abs(x mod y) <= abs(y) - 1.
+let inline succ (x : int) =
+    x + 1
+
+let inline pred (x : int) =
+    x - 1
+
+/// Integer remainder. If y is not zero, the result of x mod y satisfies the following properties:
+/// x = (x / y) * y + x mod y and abs(x mod y) <= abs(y) - 1.
 /// If y = 0, x mod y raises Division_by_zero. Note that x mod y is negative only if x < 0.
 let inline (mod) (x : int) (y : int) =
     Operators.(%) x y
@@ -157,7 +162,9 @@ let inline ( ** ) (x : float) (y : float) =
 //  ceil
 //  floor
 
-//
+/// hypot x y returns sqrt(x * x + y * y), that is, the length of the hypotenuse
+/// of a right-angled triangle with sides of length x and y, or, equivalently,
+/// the distance of the point (x,y) to origin.
 let hypot (x : float) (y : float) =
     raise <| System.NotImplementedException "hypot"
 
@@ -169,30 +176,34 @@ let expm1 (x : float) =
 let log1p (x : float) =
     raise <| System.NotImplementedException "log1p"
 
-//
+/// abs_float f returns the absolute value of f.
 let inline abs_float (x : float) =
     Operators.abs x
 
-//
+/// copysign x y returns a float whose absolute value is that of x and whose sign is that of y.
+/// If x is nan, returns nan. If y is nan, returns either x or -. x, but it is not specified which.
 let copysign (x : float) (y : float) : float =
     raise <| System.NotImplementedException "copysign"
 
-//
-let mod_float (a : float) (b : float) : float =
+/// mod_float a b returns the remainder of a with respect to b.
+/// The returned value is a -. n *. b, where n is the quotient a /. b rounded towards zero to an integer.
+let inline mod_float (a : float) (b : float) : float =
     a - b * truncate (a / b)
 
-//
+/// frexp f returns the pair of the significant and the exponent of f.
+/// When f is zero, the significant x and the exponent n of f are equal to zero.
+/// When f is non-zero, they are defined by f = x *. 2 ** n and 0.5 <= x < 1.0.
 let frexp (f : float) : float * int =
     raise <| System.NotImplementedException "frexp"
 
-//
-let ldexp (x : float) (n : int) : float =
+/// ldexp x n returns x *. 2 ** n.
+let inline ldexp (x : float) (n : int) : float =
     x * (2.0 ** float n)
 
-//
-let modf (f : float) : float * float =
+/// modf f returns the pair of the fractional and integral part of f.
+let inline modf (f : float) : float * float =
     let integral = Operators.floor f
-    (integral, f - integral)
+    integral, f - integral
 
 /// Convert an integer to floating-point.
 let inline float_of_int (value : int) : float =
@@ -225,8 +236,6 @@ let [<Literal>] min_float =
 
 /// The difference between 1.0 and the smallest exactly representable floating-point number greater than 1.0.
 let [<Literal>] epsilon_float = 0x3CB0000000000000LF // Int64.float_of_bits 4372995238176751616L
-
-
 
 /// The five classes of floating-point numbers, as determined by
 /// the <see cref="classify_float"/> function.
@@ -1262,58 +1271,4 @@ let exit (exitCode : int) =
 /// recently added with <see cref="at_exit"/> is called first.</para></remarks>
 let at_exit (f : unit -> unit) : unit =
     ExitCallbacks.at_exit f
-
-
-(*
-exception Match_failure = Microsoft.FSharp.Core.MatchFailureException
-exception Assert_failure of string * int * int 
-
-exception Undefined 
-
-exception End_of_file      = System.IO.EndOfStreamException
-exception Out_of_memory    = System.OutOfMemoryException
-exception Division_by_zero = System.DivideByZeroException
-exception Stack_overflow   = System.StackOverflowException
-
-let Not_found<'a> = (new KeyNotFoundException("The item was not found during a search or in a collection") :> exn)
-let (|Not_found|_|) (inp:exn) = match inp with :? KeyNotFoundException -> Some() | _ -> None
-
-let Invalid_argument (msg:string) = (new System.ArgumentException(msg) :> exn)
-let (|Invalid_argument|_|) (inp:exn) = match inp with :? System.ArgumentException as e -> Some(e.Message) | _ -> None
-
-let invalid_arg s = raise (System.ArgumentException(s))
-
-let not_found() = raise Not_found
-
-let int_neg (x:int) = -x
-let inline (.()) (arr: _[]) n = arr.[n]
-let inline (.()<-) (arr: _[]) n x = arr.[n] <- x
-
-let succ (x:int) = x + 1
-let pred (x:int) = x - 1
-
-(*  mod_float x y = x - y * q where q = truncate(a/b) and truncate x removes fractional part of x *)
-let truncate (x:float) : int = int32 x
-
-#if FX_NO_TRUNCATE
-let truncatef (x:float) = 
-    if x >= 0.0 then 
-        System.Math.Floor x
-    else
-        System.Math.Ceiling x
-#else
-let truncatef (x:float) = System.Math.Truncate x
-#endif
-
-let string_of_int (x:int) = x.ToString()
-let int_of_string (s:string) = try int32 s with _ -> failwith "int_of_string"
-let string_to_int   x = int_of_string x
-*)
-
-
-(*
-module Pervasives = 
-    let hash  (x: 'a) = LanguagePrimitives.GenericHash x
-    let invalid_arg s = raise (System.ArgumentException(s))
-*)
 
