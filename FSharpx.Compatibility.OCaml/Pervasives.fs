@@ -349,8 +349,11 @@ let float_of_string (str : string) : float =
 
 (*** Pair operations ***)
 
-// NOTE : The 'fst' and 'snd' functions are already
-// provided in the F# Core Library (FSharp.Core).
+/// Return the first component of a pair.
+let inline fst p = fst p
+
+/// Return the second component of a pair.
+let inline snd p = snd p
 
 
 (*** List operations ***)
@@ -360,10 +363,24 @@ let float_of_string (str : string) : float =
 
 
 (*** Input/output ***)
+(* Note: all input/output functions can raise Sys_error when the system calls they invoke fail. *)
 
-type out_channel = TextWriter
+/// The type of input channel.
 type in_channel = System.IO.TextReader
 
+/// The type of output channel.
+type out_channel = TextWriter
+
+/// The standard input for the process.
+let stdin : in_channel = stdin
+
+/// The standard output for the process.
+let stdout : out_channel = stdout
+
+/// The standard error output for the process.
+let stderr : out_channel = stderr
+
+//
 type open_flag =
     | Open_rdonly | Open_wronly | Open_append
     | Open_creat | Open_trunc | Open_excl
