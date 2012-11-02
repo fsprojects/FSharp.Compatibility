@@ -22,7 +22,7 @@ open System.Text
 
 type position = Position  
 
-type lexbuf =  LexBuffer<byte>
+type lexbuf = LexBuffer<byte>
 
 //
 let from_function (f : byte[] -> int -> int) =
@@ -39,7 +39,7 @@ let from_text_reader (enc: System.Text.Encoding) (tr: TextReader) =
     else enc.GetBytes (charbuf, 0, nRead, bytebuf, start)
 
 //
-let defaultEncoding =
+let private defaultEncoding =
 #if FX_NO_DEFAULT_ENCODING
         Encoding.UTF8
 #else
