@@ -135,47 +135,46 @@ type formatter = {
     (* Global variables: default initialization is
      set_margin 78
      set_min_space_left 0. *)
-    (* Value of right margin. *)
+    /// Value of right margin.
     mutable pp_margin : int;
-    (* Minimal space left before margin, when opening a block. *)
+    /// Minimal space left before margin, when opening a block.
     mutable pp_min_space_left : int;
-    (* Maximum value of indentation:
-     no blocks can be opened further. *)
+    /// Maximum value of indentation: no blocks can be opened further.
     mutable pp_max_indent : int;
-    (* Space remaining on the current line. *)
+    /// Space remaining on the current line.
     mutable pp_space_left : int;
-    (* Current value of indentation. *)
+    /// Current value of indentation.
     mutable pp_current_indent : int;
-    (* True when the line has been broken by the pretty-printer. *)
+    /// True when the line has been broken by the pretty-printer.
     mutable pp_is_new_line : bool;
-    (* Total width of tokens already printed. *)
+    /// Total width of tokens already printed.
     mutable pp_left_total : int;
-    (* Total width of tokens ever put in queue. *)
+    /// Total width of tokens ever put in queue.
     mutable pp_right_total : int;
-    (* Current number of opened blocks. *)
+    /// Current number of opened blocks.
     mutable pp_curr_depth : int;
-    (* Maximum number of blocks which can be simultaneously opened. *)
+    /// Maximum number of blocks which can be simultaneously opened.
     mutable pp_max_boxes : int;
-    (* Ellipsis string. *)
+    /// Ellipsis string.
     mutable pp_ellipsis : string;
-    (* Output function. *)
+    /// Output function.
     mutable pp_out_string : string -> int -> int -> unit;
-    (* Flushing function. *)
+    /// Flushing function.
     mutable pp_out_flush : unit -> unit;
-    (* Output of new lines. *)
+    /// Output of new lines.
     mutable pp_out_newline : unit -> unit;
-    (* Output of indentation spaces. *)
+    /// Output of indentation spaces.
     mutable pp_out_spaces : int -> unit;
-    (* Are tags printed ? *)
+    /// Are tags printed?
     mutable pp_print_tags : bool;
-    (* Are tags marked ? *)
+    /// Are tags marked?
     mutable pp_mark_tags : bool;
-    (* Find opening and closing markers of tags. *)
+    /// Find opening and closing markers of tags.
     mutable pp_mark_open_tag : tag -> string;
     mutable pp_mark_close_tag : tag -> string;
     mutable pp_print_open_tag : tag -> unit;
     mutable pp_print_close_tag : tag -> unit;
-    (* The pretty-printer queue. *)
+    /// The pretty-printer queue.
     mutable pp_queue : pp_queue_elem queue
   }
 
@@ -184,7 +183,7 @@ type formatter = {
   Auxilliaries and basic functions.
 
  **************************************************************)
-(* Queues auxilliaries. *)
+/// Queues auxilliaries.
 let make_queue () = { insert = Nil; body = Nil; }
   
 let clear_queue q =
@@ -192,10 +191,10 @@ let clear_queue q =
     q.body <- Nil
   
 let add_queue x q =
-  let c = Cons { head = x; tail = Nil; }
-  in
+    let c = Cons { head = x; tail = Nil; }
     match q with
-    | { insert = Cons cell; body = _ } -> (q.insert <- c; cell.tail <- c)
+    | { insert = Cons cell; body = _ } ->
+        (q.insert <- c; cell.tail <- c)
     | (* Invariant: when insert is Nil body should be Nil. *)
         { insert = Nil; body = _ } -> (q.insert <- c; q.body <- c)
   
@@ -216,15 +215,14 @@ let take_queue =
   | { body = Nil; insert = _ } -> raise Empty_queue
   
 (* Enter a token in the pretty-printer queue. *)
-let pp_enqueue state (({ length = len; elem_size = _; token = _ } as token))
-               =
-  (state.pp_right_total <- state.pp_right_total + len;
-   add_queue token state.pp_queue)
+let pp_enqueue state (({ length = len; elem_size = _; token = _ } as token)) =
+    state.pp_right_total <- state.pp_right_total + len
+    add_queue token state.pp_queue
   
 let pp_clear_queue state =
-  (state.pp_left_total <- 1;
-   state.pp_right_total <- 1;
-   clear_queue state.pp_queue)
+    state.pp_left_total <- 1
+    state.pp_right_total <- 1
+    clear_queue state.pp_queue
   
 (* Pp_infinity: large value for default tokens size.
 
