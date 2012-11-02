@@ -1,5 +1,4 @@
-(*  OCaml Compatibility Library for F#
-    (FSharpx.Compatibility.OCaml)
+(*  Compatibility Libraries for F#
 
     Copyright (c) Microsoft Corporation 2005-2009
     Copyright (c) Jack Pappas 2012
