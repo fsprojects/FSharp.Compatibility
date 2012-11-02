@@ -2,9 +2,9 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharpx.Compatibility.OCaml.System</id>
-        <version>0.1.7</version>
+        <version>0.1.8</version>
         <dependencies>
-            <dependency id="FSharpx.Compatibility.OCaml" version="0.1.7" />
+            <dependency id="FSharpx.Compatibility.OCaml" version="0.1.8" />
         </dependencies>
         <title>OCaml Compatibility Library for F# (System programming modules)</title>
         <authors>Jack Pappas</authors>
