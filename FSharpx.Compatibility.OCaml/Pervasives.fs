@@ -519,6 +519,27 @@ type InChannelImpl (r : reader) =
         | BinaryR w -> w
         | _ -> failwith "cannot access a binary writer for this channel"
 
+    //
+    override __.Read () =
+        match reader with
+        | StreamR sr ->
+            sr.Read ()
+        | BinaryR br ->
+            br.Read ()
+        | TextR tr ->
+            (tr ()).Read ()
+
+    //
+    override __.Read (buffer, index, count) =
+        match reader with
+        | StreamR sr ->
+            sr.Read (buffer, index, count)
+        | BinaryR br ->
+            br.Read (buffer, index, count)
+        | TextR tr ->
+            (tr ()).Read (buffer, index, count)
+
+
 //
 let (!!) (os : out_channel) =
     match os with
@@ -1009,7 +1030,7 @@ let in_channel_length (is : in_channel) =
     int32 (InChannel.to_Stream is).Length
 
 //
-let input_bytes_from_TextReader (tr : TextReader) (enc : Encoding) (buf : byte[]) (x : int) (len : int) = 
+let private input_bytes_from_TextReader (tr : TextReader) (enc : Encoding) (buf : byte[]) (x : int) (len : int) = 
     /// Don't read too many characters!
     let lenc = (len * 99) / enc.GetMaxByteCount (100)
     let charbuf : char[] = Array.zeroCreate lenc
