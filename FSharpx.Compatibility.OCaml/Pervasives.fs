@@ -432,7 +432,7 @@ let private defaultEncoding =
 #endif
 
 //
-type OutChannelImpl (w : writer) =
+type OutChannelImpl internal (w : writer) =
     inherit TextWriter ()
     //
     let mutable writer = w
@@ -487,7 +487,7 @@ type reader =
     | BinaryR of BinaryReader
 
 /// See OutChannelImpl
-type InChannelImpl (r : reader) =
+type InChannelImpl internal (r : reader) =
     inherit TextReader ()
     //
     let mutable reader = r
@@ -550,7 +550,7 @@ type InChannelImpl (r : reader) =
 
 
 //
-let (!!) (os : out_channel) =
+let private (!!) (os : out_channel) =
     match os with
     | :? OutChannelImpl as os ->
         os.Writer
@@ -560,7 +560,7 @@ let (!!) (os : out_channel) =
         TextW (fun () -> os)
 
 //
-let (<--) (os: out_channel) os' =
+let private (<--) (os: out_channel) os' =
     match os with
     | :? OutChannelImpl as os ->
         os.Writer <- os'
@@ -568,15 +568,15 @@ let (<--) (os: out_channel) os' =
         failwith "the mode may not be adjusted on a writer not created with one of the Pervasives.open_* functions"
     
 //
-let stream_to_BinaryWriter s =
+let private stream_to_BinaryWriter s =
     BinaryW (new BinaryWriter (s))
 
 //
-let stream_to_StreamWriter (encoding : Encoding) (s : Stream) =
+let private stream_to_StreamWriter (encoding : Encoding) (s : Stream) =
     StreamW (new StreamWriter (s, encoding))
 
 //
-module OutChannel =
+module private OutChannel =
     let to_Stream (os : out_channel) =
         match !!os with
         | BinaryW bw ->
@@ -841,7 +841,7 @@ let output_value (os : out_channel) (x : 'a) =
 #endif
 
 //
-let (!!!) (c : in_channel) =
+let private (!!!) (c : in_channel) =
     match c with
     | :? InChannelImpl as c ->
         c.Reader
@@ -851,21 +851,21 @@ let (!!!) (c : in_channel) =
         TextR (fun () -> c)
 
 //
-let (<---) (c: in_channel) r =
+let private (<---) (c: in_channel) r =
     match c with
     | :? InChannelImpl as c ->
         c.Reader<- r
     | _ -> failwith "the mode may only be adjusted channels created with one of the Pervasives.open_* functions"
 
 //
-let mk_BinaryReader (s: Stream) =
+let private mk_BinaryReader (s: Stream) =
     BinaryR (new BinaryReader (s))
 //
-let mk_StreamReader e (s: Stream) =
+let private mk_StreamReader e (s: Stream) =
     StreamR (new StreamReader (s, e, false))
 
 //
-module InChannel =
+module private InChannel =
     let of_Stream (e : Encoding) (s : Stream) =
         new InChannelImpl (mk_StreamReader e s)
         :> in_channel
@@ -1067,7 +1067,7 @@ let really_input (is : in_channel) (buf : byte[]) (x : int) (len : int) =
         n <- n + i
 
 //
-let unsafe_really_input (is : in_channel) buf x len =
+let private unsafe_really_input (is : in_channel) buf x len =
     really_input is buf x len
 //
 let input_binary_int (is : in_channel) =
