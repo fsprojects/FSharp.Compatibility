@@ -251,6 +251,16 @@ type fpclass =
     /// Not a number: result of an undefined operation.
     | FP_nan
 
+/// Determines if the given floating-point number is a subnormal value.
+let private isSubnormal (value : float) =
+    let rawValue = uint64 <| BitConverter.DoubleToInt64Bits value
+
+    let exponent = (rawValue &&& 0x7FF0000000000000UL) >>> 52
+    let significand = rawValue &&& 0x000FFFFFFFFFFFFFUL
+
+    exponent = 0UL
+    && significand <> 0UL
+
 /// Return the class of the given floating-point number:
 /// normal, subnormal, zero, infinite, or not a number.
 let classify_float (value : float) : fpclass =
@@ -260,10 +270,9 @@ let classify_float (value : float) : fpclass =
         FP_nan
     elif Double.IsInfinity value then
         FP_infinite
+    elif isSubnormal value then
+        FP_subnormal
     else
-        // TODO : Subnormals need to be handled, but there is no
-        // built-in .NET function for this so we'll have to implement something.
-        raise <| System.NotImplementedException "classify_float"
         FP_normal
 
 
@@ -1239,7 +1248,19 @@ module LargeFile =
 (*** Operations on format strings ***)
 
 type format4<'a, 'b, 'c, 'd> = Microsoft.FSharp.Core.Format<'a, 'b, 'c, 'd>
-type format<'a, 'b, 'c> = Microsoft.FSharp.Core.Format<'a, 'b, 'c, 'c>
+type format<'a, 'b, 'c> = format4<'a, 'b, 'c, 'c>
+
+//
+let string_of_format (fmt : format6<_,_,_,_,_,_>) : string =
+    raise <| System.NotImplementedException "string_of_format"
+
+//
+let format_of_string (str : string) : format6<_,_,_,_,_,_> =
+    raise <| System.NotImplementedException "format_of_string"
+
+//
+let ( ^^ ) (f1 : format6<'a, 'b, 'c, 'd, 'e, 'f>) (f2 : format6<'f, 'b, 'c, 'e, 'g, 'h>) : format6<'a, 'b, 'c, 'd, 'g, 'h> =
+    raise <| System.NotImplementedException "Pervasives.(^^)"
 
 
 (*** Program termination ***)
