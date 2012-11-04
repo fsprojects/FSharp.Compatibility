@@ -75,9 +75,9 @@ and block_type =
     | Pp_fits
 
 and tblock =
+    (* Tabulation box *)
     | Pp_tbox of (int list) ref
 
-(* Tabulation box *)
 (* The Queue:
    contains all formatting elements.
    elements are tuples (size, token, length), where
