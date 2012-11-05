@@ -52,6 +52,7 @@
     <Compile Include="UInt64.fs" />
     <Compile Include="Char.fs" />
     <Compile Include="Nativeint.fs" />
+    <Compile Include="Big_int.fs" />
     <Compile Include="Array.fs" />
     <Compile Include="Array2D.fs" />
     <Compile Include="String.fs" />
@@ -67,6 +68,7 @@
     <Compile Include="Arg.fs" />
     <Compile Include="Lexing.fs" />
     <Compile Include="Parsing.fs" />
+    <Compile Include="Ratio.fs" />
     <Compile Include="Num.fs" />
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
