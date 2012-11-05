@@ -62,6 +62,7 @@
     <Compile Include="Set.fs" />
     <Compile Include="Hashtbl.fs" />
     <Compile Include="Stack.fs" />
+    <Compile Include="Queue.fs" />
     <Compile Include="Buffer.fs" />
     <Compile Include="Lazy.fs" />
     <Compile Include="Printexc.fs" />
