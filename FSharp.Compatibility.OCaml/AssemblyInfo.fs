@@ -18,7 +18,7 @@ open System.Runtime.InteropServices
 open System.Security.Permissions
 
 
-[<assembly: AutoOpen("FSharp.Compatibility.OCaml")>]
+//[<assembly: AutoOpen("FSharp.Compatibility.OCaml")>]
 [<assembly: CLSCompliant(true)>]
 
 #if FX_NO_SECURITY_PERMISSIONS
