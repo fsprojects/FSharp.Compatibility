@@ -13,7 +13,7 @@
         <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>The Format module from the OCaml Standard Library, adapted to F#.</description>
-        <tags>fsharp,ocaml</tags>
+        <tags>fsharp,ocaml,compatibility</tags>
     </metadata>
     <files>
         <file src="..\FSharp.Compatibility.OCaml.Format\bin\Release\FSharp.Compatibility.OCaml.Format.XML" target="lib\net40\FSharp.Compatibility.OCaml.Format.XML" />
