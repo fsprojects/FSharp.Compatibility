@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>FSharp.Compatibility.StandardML</id>
+        <version>0.1.8</version>
+        <dependencies>
+        </dependencies>
+        <title>Standard ML '97 Compatibility Library for F#</title>
+        <authors>Jack Pappas</authors>
+        <owners />
+        <licenseUrl>http://opensource.org/licenses/BSD-2-Clause</licenseUrl>
+        <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Implementation of the Standard ML '97 Basis Library in F#.</description>
+        <tags>fsharp,sml,standard ml,compatibility</tags>
+    </metadata>
+    <files>
+        <file src="..\FSharp.Compatibility.StandardML\bin\Release\FSharp.Compatibility.StandardML.XML" target="lib\net40\FSharp.Compatibility.StandardML.XML" />
+        <file src="..\FSharp.Compatibility.StandardML\bin\Release\FSharp.Compatibility.StandardML.dll" target="lib\net40\FSharp.Compatibility.StandardML.dll" />
+    </files>
+</package>
