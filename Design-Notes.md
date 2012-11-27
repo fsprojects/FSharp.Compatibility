@@ -1,9 +1,9 @@
-﻿## FSharpx.Compatibility
+﻿## FSharp.Compatibility
 ### Design/Implementation Notes
 
 
 ---
-### FSharpx.Compatibility.OCaml
+### FSharp.Compatibility.OCaml
 
 -	The GC and Weak modules can be implemented using the System.GC type and
 	the System.Diagnostics.Process / System.Diagnostics.ProcessInfo types.
@@ -33,7 +33,7 @@
 
 
 ---
-### FSharpx.Compatibility.OCaml.System
+### FSharp.Compatibility.OCaml.System
 
 -	The Unix, UnixLabels, and ThreadUnix modules can be implemented in a
 	separate library, and built on top of the Mono.Unix / Mono.Posix libraries.
