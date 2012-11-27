@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharp.Compatibility.OCaml.Format</id>
-        <version>0.1.9</version>
+        <version>0.1.10</version>
         <dependencies>
             <dependency id="FSharp.Compatibility.OCaml" version="0.1.9" />
         </dependencies>
