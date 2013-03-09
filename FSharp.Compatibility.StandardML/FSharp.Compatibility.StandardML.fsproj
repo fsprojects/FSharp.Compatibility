@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Debug\FSharp.Compatibility.StandardML.XML</DocumentationFile>
+    <NoWarn>62</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Release\FSharp.Compatibility.StandardML.XML</DocumentationFile>
+    <NoWarn>62</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -39,14 +41,20 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="General.fs" />
-    <Compile Include="List.fs" />
-    <Compile Include="String.fs" />
-    <Compile Include="Unsafe.fs" />
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Unsafe.fs" />
+    <Compile Include="General.fs" />
+    <Compile Include="Option.fs" />
+    <Compile Include="List.fs" />
+    <Compile Include="ListPair.fs" />
+    <Compile Include="String.fs" />
+    <Compile Include="StringCvt.fs" />
+    <Compile Include="Bool.fs" />
+    <Compile Include="CommandLine.fs" />
+    <Compile Include="Word.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="!Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />

@@ -81,23 +81,27 @@ exception Subscript     // System.IndexOutOfRangeException
 
 /// Returns a name for the exception ex.
 /// The name returned may be that of any exception constructor aliasing with ex.
+// exn -> string
 let exnName ex =
     raise <| System.NotImplementedException "General.exnName"
 
 /// Returns a message corresponding to exception ex.
 /// The precise format of the message may vary between implementations and locales,
 /// but will at least contain the string 'exnName ex'.
+// exn -> string
 let exnMessage ex =
     raise <| System.NotImplementedException "General.exnMessage"
 
 /// Values of type 'order' are used when comparing elements of a type that has a linear ordering. 
 type order = LESS | EQUAL | GREATER
 
-// is the function composition of f and g. Thus, (f o g) a is equivalent to f(g a). 
+// is the function composition of f and g. Thus, (f o g) a is equivalent to f(g a).
+// ('b -> 'c) * ('a -> 'b) -> 'a -> 'c 
 //let inline ( o ) f g = f << g
 
-// returns a. It provides a notational shorthand for evaluating a, then b, before returning the value of a. 
-//let before a b =
+// returns a. It provides a notational shorthand for evaluating a, then b, before returning the value of a.
+// 'a * unit -> 'a
+let inline before (a, b : unit) = a
     
 /// Returns (). The purpose of ignore is to discard the result of a computation,
 /// returning () instead. This is useful, for example, when a higher-order function,
