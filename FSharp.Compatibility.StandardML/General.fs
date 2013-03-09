@@ -65,7 +65,7 @@ exception Fail of string
 
 /// The exception indicating that the result of an arithmetic function is not representable,
 /// in particular, is too large. It replaces the Abs, Exp, Neg, Prod, Quot, and Sum exceptions
-/// required by the SML'90 Definition. 
+/// required by the SML'90 Definition.
 exception Overflow
 
 /// The exception indicating an attempt to create an aggregate data structure
@@ -92,7 +92,7 @@ let exnName ex =
 let exnMessage ex =
     raise <| System.NotImplementedException "General.exnMessage"
 
-/// Values of type 'order' are used when comparing elements of a type that has a linear ordering. 
+/// Values of type 'order' are used when comparing elements of a type that has a linear ordering.
 type order = LESS | EQUAL | GREATER
 
 // is the function composition of f and g. Thus, (f o g) a is equivalent to f(g a).
