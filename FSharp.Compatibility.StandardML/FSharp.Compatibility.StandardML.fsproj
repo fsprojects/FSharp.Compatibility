@@ -39,7 +39,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="General.fs" />
     <Compile Include="List.fs" />
+    <Compile Include="String.fs" />
     <Compile Include="Unsafe.fs" />
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
