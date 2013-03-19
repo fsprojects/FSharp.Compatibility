@@ -8,7 +8,7 @@
         <title>Standard ML '97 Compatibility Library for F#</title>
         <authors>Jack Pappas</authors>
         <owners />
-        <licenseUrl>http://opensource.org/licenses/BSD-2-Clause</licenseUrl>
+        <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
         <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Implementation of the Standard ML '97 Basis Library in F#.</description>
