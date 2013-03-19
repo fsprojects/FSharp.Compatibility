@@ -57,7 +57,9 @@
     <Compile Include="Word.fs" />
     <Compile Include="Substring.fs" />
     <Compile Include="Char.fs" />
+    <Compile Include="Int.fs" />
     <Compile Include="IEEEReal.fs" />
+    <Compile Include="TopLevel.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="!Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />

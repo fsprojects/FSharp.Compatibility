@@ -95,7 +95,17 @@ val * : word * word -> word
 val div : word * word -> word
 val mod : word * word -> word
 
-val compare : word * word -> order
+*)
+
+//
+let inline compare (i : word, j : word) : order =
+    let comp = compare i j
+    if comp = 0 then EQUAL
+    elif comp < 0 then LESS
+    else GREATER
+
+(*
+
 val <  : word * word -> bool
 val <= : word * word -> bool
 val >  : word * word -> bool
