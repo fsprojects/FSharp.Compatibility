@@ -124,11 +124,11 @@ let foldrEq (f : 'a * 'b * 'c -> 'c) init (l1, l2) : 'c =
 /// <c>List.exists f (zip (l1, l2))</c>
 /// </remarks>
 let all (f : 'a * 'b -> bool) (l1, l2) : bool =
-    raise <| System.NotImplementedException "ListPair.all"
+    List.forall2 (FuncConvert.FuncFromTupled f) l1 l2
 
 //
 let exists (f : 'a * 'b -> bool) (l1, l2) : bool =
-    raise <| System.NotImplementedException "ListPair.exists"
+    List.exists2 (FuncConvert.FuncFromTupled f) l1 l2
 
 /// <summary>
 /// returns true if l1 and l2 have equal length and all pairs of elements satisfy the predicate f.
