@@ -37,4 +37,5 @@ let inline size (s : string) =
 /// a NULL pointer to indicate no value.
 type 'a option = 'a Option.option
 
-
+// TODO : Make sure that the F# float (System.Double) has the correct semantics for 'real'.
+type real = float
