@@ -49,14 +49,15 @@ type lazy_t<'a> = Lazy<'a>
 (*** Predefined exceptions ***)
 
 //
-//exception Match_failure of string * int * int
-type Match_failure = MatchFailureException
+[<Obsolete("Code which raises Match_failure should be changed to raise MatchFailureException instead.")>]
+exception Match_failure of string * int * int
 
 /// Exception raised when an assertion fails.
 /// The arguments are the location of the assert keyword in the source code (file name, line number, column number). 
 exception Assert_failure of string * int * int
 
 /// Exception raised by library functions to signal that the given arguments do not make sense.
+[<Obsolete("Code which raises Invalid_argument should be changed to raise System.ArgumentException instead.")>]
 exception Invalid_argument of string
 
 /// Exception raised by library functions to signal that they are undefined on the given arguments.
@@ -71,15 +72,15 @@ exception Not_found
 // TODO : This exception can only be raised by the garbage collector,
 // so any other code will only be consuming it.
 // Therefore, this should probably be changed to an active pattern instead.
-//exception Out_of_memory
-type Out_of_memory = OutOfMemoryException
+[<Obsolete("Code which raises Out_of_memory should be changed to raise System.OutOfMemoryException instead.")>]
+exception Out_of_memory
 
 /// Exception raised by the bytecode interpreter when the evaluation stack reaches its maximal size.
 /// This often indicates infinite or excessively deep recursion in the user’s program.
 // TODO : This exception shouldn't ever be raised by user code, so it should
 // probably be changed to an active pattern instead.
-//exception Stack_overflow
-type Stack_overflow = StackOverflowException
+[<Obsolete("Code which raises Stack_overflow should be changed to raise System.StackOverflowException instead.")>]
+exception Stack_overflow
 
 /// Exception raised by the input/output functions to report an operating system error.
 exception Sys_error of string
@@ -88,8 +89,8 @@ exception Sys_error of string
 exception End_of_file
 
 /// Exception raised by integer division and remainder operations when their second argument is zero.
-//exception Division_by_zero
-type Division_by_zero = DivideByZeroException
+[<Obsolete("Code which raises Division_by_zero should be changed to raise System.DivideByZeroException instead.")>]
+exception Division_by_zero
 
 /// A special case of <see cref="Sys_error"/> raised when no I/O is possible on a non-blocking I/O channel. 
 exception Sys_blocked_io
