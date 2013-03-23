@@ -16,13 +16,14 @@ limitations under the License.
 
 *)
 
-module FSharp.Compatibility.OCaml.Tests.Num
+module FSharp.Compatibility.OCaml.Num.Tests
+
+#nowarn "62"
 
 open System
 open System.Numerics
 open Microsoft.FSharp.Math
 open FSharp.Compatibility.OCaml.Num
-
 open NUnit.Framework
 open FsUnit
 

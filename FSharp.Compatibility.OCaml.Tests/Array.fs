@@ -16,12 +16,13 @@ limitations under the License.
 
 *)
 
-module FSharp.Compatibility.OCaml.Tests.Array
+module FSharp.Compatibility.OCaml.Array.Tests
 
-open NUnit.Framework
-open FsUnit
+#nowarn "62"
 
 open FSharp.Compatibility.OCaml.Array
+open NUnit.Framework
+open FsUnit
 
 
 // TODO : Add test cases.

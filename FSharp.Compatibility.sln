@@ -22,6 +22,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.Haskel
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.Scala", "FSharp.Compatibility.Scala\FSharp.Compatibility.Scala.fsproj", "{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.System.Tests", "FSharp.Compatibility.OCaml.System.Tests\FSharp.Compatibility.OCaml.System.Tests.fsproj", "{E7A0AE32-362C-49BF-AFB7-D3466453973A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
