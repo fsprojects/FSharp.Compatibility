@@ -18,13 +18,15 @@ limitations under the License.
 
 module FSharp.Compatibility.OCaml.Tests.Num
 
-open NUnit.Framework
-open FsUnit
-
 open System
 open System.Numerics
 open Microsoft.FSharp.Math
 open FSharp.Compatibility.OCaml.Num
+
+open NUnit.Framework
+open FsUnit
+
+(* TODO : Import the BigRational tests from the F# PowerPack. *)
 
 
 [<Test>]
