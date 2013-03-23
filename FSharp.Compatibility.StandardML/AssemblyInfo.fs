@@ -26,9 +26,12 @@ open System.Runtime.InteropServices
 open System.Security.Permissions
 
 
-[<assembly: AutoOpen("FSharp.Compatibility.StandardML")>]
-[<assembly: CLSCompliant(true)>]
+(* Assembly information *)
+[<assembly: Guid("53091CB9-C929-4E9B-A32F-D0599A7DBFCA")>]
+// TODO : Make sure the assembly is actually CLS-compliant, then enable this attribute.
+//[<assembly: CLSCompliant(true)>]
 
+(* Security *)
 #if FX_NO_SECURITY_PERMISSIONS
 #else
 #if FX_SIMPLE_SECURITY_PERMISSIONS
@@ -37,9 +40,16 @@ open System.Security.Permissions
 #endif
 #endif
 
+(* NGen dependencies *)
 #if FX_NO_DEFAULT_DEPENDENCY_TYPE
 #else
-[<assembly: Dependency("FSharp.Core", LoadHint.Always)>] 
+[<assembly: Dependency("FSharp.Core", LoadHint.Always)>]
+// TODO : Add DefaultDependency attribute
 #endif
 
+(* Automatically open base namespaces and modules *)
+[<assembly: AutoOpen("FSharp.Compatibility.StandardML")>]
+
+// This is needed because F# doesn't recognize assembly-level attributes as module
+// content; without this, the module appears empty and the compiler gives an error.
 do ()

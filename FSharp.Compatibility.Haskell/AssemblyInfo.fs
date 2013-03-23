@@ -1,7 +1,6 @@
 ﻿(*
 
-Copyright 2005-2009 Microsoft Corporation
-Copyright 2012 Jack Pappas
+Copyright 2013 Jack Pappas
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,7 +27,7 @@ open System.Security.Permissions
 
 
 (* Assembly information *)
-[<assembly: Guid("6969A4AC-E2AA-4D30-9426-32A994B5F8E3")>]
+[<assembly: Guid("0B3E8977-DD1F-4456-9371-D797E572970C")>]
 // TODO : Make sure the assembly is actually CLS-compliant, then enable this attribute.
 //[<assembly: CLSCompliant(true)>]
 
@@ -49,15 +48,7 @@ open System.Security.Permissions
 #endif
 
 (* Automatically open base namespaces and modules *)
-//[<assembly: AutoOpen("FSharp.Compatibility.OCaml")>]
-
-(* Suppress some FxCop messages *)
-[<assembly: SuppressMessage(
-    "Microsoft.Globalization",
-    "CA1305:SpecifyIFormatProvider",
-    Scope = "member",
-    Target = "Internal.Utilities.Pervasives+OutChannelImpl.#.ctor(Internal.Utilities.Pervasives+writer)",
-    MessageId = "System.IO.TextWriter.#ctor")>]
+[<assembly: AutoOpen("FSharp.Compatibility.Haskell.Prelude")>]
 
 // This is needed because F# doesn't recognize assembly-level attributes as module
 // content; without this, the module appears empty and the compiler gives an error.

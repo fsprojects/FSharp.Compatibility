@@ -42,11 +42,12 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Printf.fs" />
-    <Compile Include="Format.fs" />
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
     </Compile>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Printf.fs" />
+    <Compile Include="Format.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj">
