@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>FSharp.Compatibility.Scala</id>
+        <version>0.1.10</version>
+        <dependencies>
+        </dependencies>
+        <title>Scala Compatibility Library for F#</title>
+        <authors>Jack Pappas</authors>
+        <owners />
+        <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
+        <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Implementation of the Scala standard library in F#.</description>
+        <tags>fsharp,scala,java,jvm,ikvm,compatibility</tags>
+    </metadata>
+    <files>
+        <file src="..\FSharp.Compatibility.Scala\bin\Release\FSharp.Compatibility.Scala.XML" target="lib\net40\FSharp.Compatibility.Scala.XML" />
+        <file src="..\FSharp.Compatibility.Scala\bin\Release\FSharp.Compatibility.Scala.dll" target="lib\net40\FSharp.Compatibility.Scala.dll" />
+    </files>
+</package>
