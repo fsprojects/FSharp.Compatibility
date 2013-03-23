@@ -20,6 +20,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.Standa
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.Haskell", "FSharp.Compatibility.Haskell\FSharp.Compatibility.Haskell.fsproj", "{6A12D691-8475-4579-A71B-EBA478F70C4B}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.Scala", "FSharp.Compatibility.Scala\FSharp.Compatibility.Scala.fsproj", "{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{6A12D691-8475-4579-A71B-EBA478F70C4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A12D691-8475-4579-A71B-EBA478F70C4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A12D691-8475-4579-A71B-EBA478F70C4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
