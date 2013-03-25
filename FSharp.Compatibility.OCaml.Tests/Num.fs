@@ -27,8 +27,6 @@ open FSharp.Compatibility.OCaml.Num
 open NUnit.Framework
 open FsUnit
 
-(* TODO : Import the BigRational tests from the F# PowerPack. *)
-
 
 [<Test>]
 let ``0 does not equal 1``() =
@@ -104,7 +102,4 @@ let ``num_of_string parse big integer``() =
 let ``num_of_string invalid string``() =
     num_of_string "123.4"
     |> ignore
-
-
-
 
