@@ -23,7 +23,7 @@ limitations under the License.
 /// a vector of the underlying character type char as defined in the structure. 
 module FSharp.Compatibility.StandardML.String
 
-open Option
+open FSharp.Compatibility.StandardML.Option
 
 (*
 eqtype string

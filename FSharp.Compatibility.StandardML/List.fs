@@ -31,7 +31,7 @@ limitations under the License.
 /// </remarks>
 module FSharp.Compatibility.StandardML.List
 
-open Option
+open FSharp.Compatibility.StandardML.Option
 
 
 type list<'a> = Microsoft.FSharp.Collections.list<'a>

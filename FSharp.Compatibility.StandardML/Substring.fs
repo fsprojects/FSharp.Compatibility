@@ -22,17 +22,15 @@ limitations under the License.
 //
 module FSharp.Compatibility.StandardML.Substring
 
-// string
-// dropl
-// dropr
-// full
+//
+type substring = ExtCore.Substring
+//
+type char = System.Char
+//
+type string = System.String
 
 
 (*
-
-type substring
-eqtype char
-eqtype string
 
 val sub : substring * int -> char
 val size : substring -> int
