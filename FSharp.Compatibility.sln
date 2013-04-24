@@ -1,18 +1,18 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml", "FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj", "{DFE5F3B6-2BFB-46FC-A315-B3A841B3E566}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.System", "FSharp.Compatibility.OCaml.System\FSharp.Compatibility.OCaml.System.fsproj", "{3EB634CE-737D-446E-8720-0D84C595A814}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.Format", "FSharp.Compatibility.OCaml.Format\FSharp.Compatibility.OCaml.Format.fsproj", "{7B5B561F-00E6-4E62-A9ED-45995CB00E81}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3F4B7398-DFE7-4911-B479-E2D16A8134D9}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml", "FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj", "{DFE5F3B6-2BFB-46FC-A315-B3A841B3E566}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.System", "FSharp.Compatibility.OCaml.System\FSharp.Compatibility.OCaml.System.fsproj", "{3EB634CE-737D-446E-8720-0D84C595A814}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.Format", "FSharp.Compatibility.OCaml.Format\FSharp.Compatibility.OCaml.Format.fsproj", "{7B5B561F-00E6-4E62-A9ED-45995CB00E81}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.Tests", "FSharp.Compatibility.OCaml.Tests\FSharp.Compatibility.OCaml.Tests.fsproj", "{E82A40EA-FFF1-471C-84E0-843D9F288E8C}"
 EndProject
