@@ -18,6 +18,16 @@ limitations under the License.
 
 module FSharp.Compatibility.Haskell.Prelude
 
+(* Type extensions for built-in .NET and F# types *)
+
+//
+let inline (++) (str1 : string) (str2 : string) =
+    System.String.Concat (str1, str2)
+
+//
+let inline show x =
+    x.ToString ()
+
 // Haskell              | F#
 //---------------------------------
 // rem                  | %
@@ -27,5 +37,19 @@ module FSharp.Compatibility.Haskell.Prelude
 // divMod               | ?
 // quotRem              | divRem
 
+/// Type abbreviation for Haskell's Either type.
+// NOTE : If the Haskell Either type were directly translated to use Choice`2, then Left would become
+// Choice1Of2 and Right would become Choice2Of2. However, this pattern "inverts" the translation,
+// because Choice1Of2 and Right normally represent a "success" value while Choice2Of2 and Left
+// represent an "error" value.
+type Either<'a, 'b> = Choice<'b, 'a>
+
+/// Active pattern which simulates Either using the Choice type.
+let inline (|Right|Left|) (either : Either<'a, 'b>) : Either<_,_> =
+    match either with
+    | Choice1Of2 x ->
+        Right x
+    | Choice2Of2 x ->
+        Left x
 
 
