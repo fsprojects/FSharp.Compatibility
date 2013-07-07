@@ -32,8 +32,14 @@ open System
 
 /// Return the ASCII code of the argument.
 let code (c : char) : int =
-    // TODO : What do we do if 'c' is a non-ASCII (i.e., Unicode) char?
-    raise <| System.NotImplementedException "Char.code"
+    // NOTE : The OCaml documentation for this function does not specify what to do
+    // if the character is a non-ASCII (i.e., Unicode) character; until the specific
+    // behavior of the function can be determined, we'll raise an exception here,
+    // as done in the 'Char.chr' function.
+    if int c > int Byte.MaxValue then
+        raise <| Invalid_argument "Char.code"
+    
+    int c
 
 /// Return the character with the given ASCII code.
 let chr (value : int) : char =
