@@ -4,6 +4,7 @@
         <id>FSharp.Compatibility.StandardML</id>
         <version>0.1.10</version>
         <dependencies>
+	    <dependency id="ExtCore" version="0.8.29" />
         </dependencies>
         <title>Standard ML '97 Compatibility Library for F#</title>
         <authors>Jack Pappas</authors>

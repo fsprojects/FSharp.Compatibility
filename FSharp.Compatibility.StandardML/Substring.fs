@@ -23,7 +23,7 @@ limitations under the License.
 module FSharp.Compatibility.StandardML.Substring
 
 //
-type substring = ExtCore.Substring
+type substring = ExtCore.substring
 //
 type char = System.Char
 //

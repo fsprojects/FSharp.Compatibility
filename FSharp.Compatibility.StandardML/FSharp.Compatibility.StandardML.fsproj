@@ -43,6 +43,7 @@
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="(!Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')) And (!Exists('$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets')) And (Exists('$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets'))" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <ItemGroup>
+    <None Include="packages.config" />
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
     </Compile>
@@ -64,11 +65,10 @@
     <Compile Include="Real.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="TopLevel.fs" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ExtCore">
-      <HintPath>..\packages\ExtCore.0.8.19\lib\net40\ExtCore.dll</HintPath>
+      <HintPath>..\packages\ExtCore.0.8.29\lib\net40\ExtCore.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
