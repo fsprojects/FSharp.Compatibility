@@ -4,7 +4,7 @@
         <id>FSharp.Compatibility.OCaml.Format</id>
         <version>0.1.10</version>
         <dependencies>
-            <dependency id="FSharp.Compatibility.OCaml" version="0.1.9" />
+            <dependency id="FSharp.Compatibility.OCaml" version="0.1.10" />
         </dependencies>
         <title>OCaml Compatibility Library for F# (Format module)</title>
         <authors>Jack Pappas</authors>
@@ -13,7 +13,7 @@
         <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>The Format module from the OCaml Standard Library, adapted to F#.</description>
-        <tags>fsharp,ocaml,compatibility</tags>
+        <tags>fsharp ocaml compatibility</tags>
     </metadata>
     <files>
         <file src="..\FSharp.Compatibility.OCaml.Format\bin\Release\FSharp.Compatibility.OCaml.Format.XML" target="lib\net40\FSharp.Compatibility.OCaml.Format.XML" />

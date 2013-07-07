@@ -13,7 +13,7 @@
         <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Implementation of the Standard ML '97 Basis Library in F#.</description>
-        <tags>fsharp,sml,standard ml,compatibility</tags>
+        <tags>fsharp sml standard ml compatibility</tags>
     </metadata>
     <files>
         <file src="..\FSharp.Compatibility.StandardML\bin\Release\FSharp.Compatibility.StandardML.XML" target="lib\net40\FSharp.Compatibility.StandardML.XML" />
