@@ -38,6 +38,10 @@ open System.Numerics
 //open Microsoft.FSharp.Math
 open Ratio
 
+// TEMP : This is needed to force the use of the BigRational type from Math.NET Numerics
+// instead of the one from the F# PowerPack.
+type BigRational = MathNet.Numerics.BigRational
+
 // TEMP : Alias for 'nat' so it can be used by the function definitions below.
 // TODO : For full compatibility, 'nat' needs to be defined as in OCaml, i.e.,
 // as an inductive type which can represent an arbitrary-length unsigned integer.
@@ -52,7 +56,7 @@ type Num =
     /// Arbitrary-precision integer.
     | Big_int of bigint
     // Arbitrary-precision rational.
-    | Ratio of BigRational
+    | Ratio of ratio  // TODO : Change to 'ratio'
 
     //
     static member Zero

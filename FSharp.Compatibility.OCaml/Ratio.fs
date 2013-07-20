@@ -30,296 +30,84 @@ limitations under the License.
 module FSharp.Compatibility.OCaml.Ratio
 
 open System.Numerics
+open MathNet.Numerics
+open FSharp.Compatibility.OCaml.Big_int
 
-
-(* The BigRational type from the F# PowerPack *)
-[<AutoOpen>]
-module internal BigRationalLargeImpl =
-    let ZeroI = BigInteger 0
-    let OneI = BigInteger 1
-    let ToDoubleI (x : BigInteger) = double x
-    let ToInt32I (x : BigInteger) = int32 x
-        
-[<CustomEquality; CustomComparison>]
-type BigRationalLarge = 
-    | Q of BigInteger * BigInteger // invariants: (p,q) in lowest form, q >= 0 
-
-    override n.ToString() =
-        let (Q(p,q)) = n 
-        if q.IsOne then p.ToString() 
-        else p.ToString() + "/" + q.ToString()
-
-    static member Hash (Q(ap,aq)) = 
-        // This hash code must be identical to the hash for BigInteger when the numbers coincide.
-        if aq.IsOne then ap.GetHashCode() else (ap.GetHashCode() <<< 3) + aq.GetHashCode()
-
-    override x.GetHashCode() = BigRationalLarge.Hash(x)
-        
-    static member Equals(Q(ap,aq), Q(bp,bq)) = 
-        BigInteger.(=)  (ap,bp) && BigInteger.(=) (aq,bq)   // normal form, so structural equality 
-        
-    static member LessThan(Q(ap,aq), Q(bp,bq)) = 
-        BigInteger.(<)  (ap * bq,bp * aq)
-        
-    // note: performance improvement possible here
-    static member Compare(p,q) = 
-        if BigRationalLarge.LessThan(p,q) then -1 
-        elif BigRationalLarge.LessThan(q,p)then  1 
-        else 0 
-
-    interface System.IComparable with 
-        member this.CompareTo(obj:obj) = 
-            match obj with 
-            | :? BigRationalLarge as that -> BigRationalLarge.Compare(this,that)
-            | _ -> invalidArg "obj" "the object does not have the correct type"
-
-    override this.Equals(that:obj) = 
-        match that with 
-        | :? BigRationalLarge as that -> BigRationalLarge.Equals(this,that)
-        | _ -> false
-
-    member x.IsNegative = let (Q(ap,_)) = x in sign ap < 0
-    member x.IsPositive = let (Q(ap,_)) = x in sign ap > 0
-
-    member x.Numerator = let (Q(p,_)) = x in p
-    member x.Denominator = let (Q(_,q)) = x in q
-    member x.Sign = (let (Q(p,_)) = x in sign p)
-
-    static member ToDouble (Q(p,q)) = 
-        ToDoubleI p / ToDoubleI q
-
-    static member Normalize (p:BigInteger,q:BigInteger) =
-        if q.IsZero then
-            raise (System.DivideByZeroException())  (* throw for any x/0 *)
-        elif q.IsOne then
-            Q(p,q)
-        else
-            let k = BigInteger.GreatestCommonDivisor(p,q)
-            let p = p / k 
-            let q = q / k 
-            if sign q < 0 then Q(-p,-q) else Q(p,q)
-
-    static member Rational  (p:int,q:int) = BigRationalLarge.Normalize (bigint p,bigint q)
-    static member RationalZ (p,q) = BigRationalLarge.Normalize (p,q)
-       
-    static member Parse (str:string) =
-        let len = str.Length 
-        if len=0 then invalidArg "str" "empty string";
-        let j = str.IndexOf '/' 
-        if j >= 0 then 
-            let p = BigInteger.Parse (str.Substring(0,j)) 
-            let q = BigInteger.Parse (str.Substring(j+1,len-j-1)) 
-            BigRationalLarge.RationalZ (p,q)
-        else
-            let p = BigInteger.Parse str 
-            BigRationalLarge.RationalZ (p,OneI)
-        
-    static member (~-) (Q(bp,bq))    = Q(-bp,bq)          // still coprime, bq >= 0 
-    static member (+) (Q(ap,aq),Q(bp,bq)) = BigRationalLarge.Normalize ((ap * bq) + (bp * aq),aq * bq)
-    static member (-) (Q(ap,aq),Q(bp,bq)) = BigRationalLarge.Normalize ((ap * bq) - (bp * aq),aq * bq)
-    static member (*) (Q(ap,aq),Q(bp,bq)) = BigRationalLarge.Normalize (ap * bp,aq * bq)
-    static member (/) (Q(ap,aq),Q(bp,bq)) = BigRationalLarge.Normalize (ap * bq,aq * bp)
-    static member ( ~+ )(n1:BigRationalLarge) = n1
-        
- 
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
-module internal BigRationalLarge = 
-    open System.Numerics
-    
-    let inv    (Q(ap,aq)) = BigRationalLarge.Normalize(aq,ap)    
-
-    let pown (Q(p,q)) (n:int) = Q(BigInteger.Pow(p,n),BigInteger.Pow  (q,n)) // p,q powers still coprime
-        
-    let equal (Q(ap,aq)) (Q(bp,bq)) = ap=bp && aq=bq   // normal form, so structural equality 
-    let lt    a b = BigRationalLarge.LessThan(a,b)
-    let gt    a b = BigRationalLarge.LessThan(b,a)
-    let lte   (Q(ap,aq)) (Q(bp,bq)) = BigInteger.(<=) (ap * bq,bp * aq)
-    let gte   (Q(ap,aq)) (Q(bp,bq)) = BigInteger.(>=) (ap * bq,bp * aq)
-
-    let of_bigint   z = BigRationalLarge.RationalZ(z,OneI )
-    let of_int n = BigRationalLarge.Rational(n,1)
-       
-    // integer part
-    let integer (Q(p,q)) =
-        let mutable r = BigInteger(0)
-        let d = BigInteger.DivRem (p,q,&r)          // have p = d.q + r, |r| < |q| 
-        if r < ZeroI
-        then d - OneI                 // p = (d-1).q + (r+q) 
-        else d                             // p =     d.q + r       
-      
-        
-//----------------------------------------------------------------------------
-// BigRational
-//--------------------------------------------------------------------------
-
-[<CustomEquality; CustomComparison>]
-[<StructuredFormatDisplay("{StructuredDisplayString}N")>]
-type BigRational =
-    | Z of BigInteger
-    | Q of BigRationalLarge
-
-    static member ( + )(n1,n2) = 
-        match n1,n2 with
-        | Z z ,Z zz -> Z (z + zz)
-        | Q q ,Q qq -> Q (q + qq)
-        | Z z ,Q qq -> Q (BigRationalLarge.of_bigint z + qq)
-        | Q q ,Z zz -> Q (q  + BigRationalLarge.of_bigint zz)
-
-    static member ( * )(n1,n2) = 
-        match n1,n2 with
-        | Z z ,Z zz -> Z (z * zz)
-        | Q q ,Q qq -> Q (q * qq)
-        | Z z ,Q qq -> Q (BigRationalLarge.of_bigint z * qq)
-        | Q q ,Z zz -> Q (q  * BigRationalLarge.of_bigint zz)
-
-    static member ( - )(n1,n2) = 
-        match n1,n2 with
-        | Z z ,Z zz -> Z (z - zz)
-        | Q q ,Q qq -> Q (q - qq)
-        | Z z ,Q qq -> Q (BigRationalLarge.of_bigint z - qq)
-        | Q q ,Z zz -> Q (q  - BigRationalLarge.of_bigint zz)
-
-    static member ( / )(n1,n2) = 
-        match n1,n2 with
-        | Z z ,Z zz -> Q (BigRationalLarge.RationalZ(z,zz))
-        | Q q ,Q qq -> Q (q / qq)
-        | Z z ,Q qq -> Q (BigRationalLarge.of_bigint z / qq)
-        | Q q ,Z zz -> Q (q  / BigRationalLarge.of_bigint zz)
-
-    static member ( ~- )(n1) = 
-        match n1 with
-        | Z z -> Z (-z)
-        | Q q -> Q (-q)
-
-    static member ( ~+ )(n1:BigRational) = n1
-
-    // nb. Q and Z hash codes must match up - see notes above
-    override n.GetHashCode() = 
-        match n with 
-        | Z z -> z.GetHashCode()
-        | Q q -> q.GetHashCode() 
-
-    override this.Equals(obj:obj) = 
-        match obj with 
-        | :? BigRational as that -> BigRational.(=)(this, that)
-        | _ -> false
-
-    interface System.IComparable with 
-        member n1.CompareTo(obj:obj) = 
-            match obj with 
-            | :? BigRational as n2 -> 
-                    if BigRational.(<)(n1, n2) then -1 elif BigRational.(=)(n1, n2) then 0 else 1
-            | _ -> invalidArg "obj" "the objects are not comparable"
-
-    static member FromInt (x:int) = Z (bigint x)
-    static member FromBigInt x = Z x
-
-    static member Zero = BigRational.FromInt(0) 
-    static member One = BigRational.FromInt(1) 
-
-
-    static member PowN (n,i:int) =
-        match n with
-        | Z z -> Z (BigInteger.Pow (z,i))
-        | Q q -> Q (BigRationalLarge.pown q i)
-
-    static member op_Equality (n,nn) = 
-        match n,nn with
-        | Z z ,Z zz -> BigInteger.(=) (z,zz)
-        | Q q ,Q qq -> (BigRationalLarge.equal q qq)
-        | Z z ,Q qq -> (BigRationalLarge.equal (BigRationalLarge.of_bigint z) qq)
-        | Q q ,Z zz -> (BigRationalLarge.equal q (BigRationalLarge.of_bigint zz))
-    static member op_Inequality (n,nn) = not (BigRational.op_Equality(n,nn))
-    
-    static member op_LessThan (n,nn) = 
-        match n,nn with
-        | Z z ,Z zz -> BigInteger.(<) (z,zz)
-        | Q q ,Q qq -> (BigRationalLarge.lt q qq)
-        | Z z ,Q qq -> (BigRationalLarge.lt (BigRationalLarge.of_bigint z) qq)
-        | Q q ,Z zz -> (BigRationalLarge.lt q (BigRationalLarge.of_bigint zz))
-    static member op_GreaterThan (n,nn) = 
-        match n,nn with
-        | Z z ,Z zz -> BigInteger.(>) (z,zz)
-        | Q q ,Q qq -> (BigRationalLarge.gt q qq)
-        | Z z ,Q qq -> (BigRationalLarge.gt (BigRationalLarge.of_bigint z) qq)
-        | Q q ,Z zz -> (BigRationalLarge.gt q (BigRationalLarge.of_bigint zz))
-    static member op_LessThanOrEqual (n,nn) = 
-        match n,nn with
-        | Z z ,Z zz -> BigInteger.(<=) (z,zz)
-        | Q q ,Q qq -> (BigRationalLarge.lte q qq)
-        | Z z ,Q qq -> (BigRationalLarge.lte (BigRationalLarge.of_bigint z) qq)
-        | Q q ,Z zz -> (BigRationalLarge.lte q (BigRationalLarge.of_bigint zz))
-    static member op_GreaterThanOrEqual (n,nn) = 
-        match n,nn with
-        | Z z ,Z zz -> BigInteger.(>=) (z,zz)
-        | Q q ,Q qq -> (BigRationalLarge.gte q qq)
-        | Z z ,Q qq -> (BigRationalLarge.gte (BigRationalLarge.of_bigint z) qq)
-        | Q q ,Z zz -> (BigRationalLarge.gte q (BigRationalLarge.of_bigint zz))
-
-    member n.IsNegative = 
-        match n with 
-        | Z z -> sign z < 0 
-        | Q q -> q.IsNegative
-
-    member n.IsPositive = 
-        match n with 
-        | Z z -> sign z > 0
-        | Q q -> q.IsPositive
-            
-    member n.Numerator = 
-        match n with 
-        | Z z -> z
-        | Q q -> q.Numerator
-
-    member n.Denominator = 
-        match n with 
-        | Z _ -> OneI
-        | Q q -> q.Denominator
-
-    member n.Sign = 
-        if n.IsNegative then -1 
-        elif n.IsPositive then  1 
-        else 0
-
-    static member Abs(n:BigRational) = 
-        if n.IsNegative then -n else n
-
-    static member ToDouble(n:BigRational) = 
-        match n with
-        | Z z -> ToDoubleI z
-        | Q q -> BigRationalLarge.ToDouble q
-
-    static member ToBigInt(n:BigRational) = 
-        match n with 
-        | Z z -> z
-        | Q q -> BigRationalLarge.integer q 
-
-    static member ToInt32(n:BigRational) = 
-        match n with 
-        | Z z -> ToInt32I(z)
-        | Q q -> ToInt32I(BigRationalLarge.integer q )
-
-    static member op_Explicit (n:BigRational) = BigRational.ToInt32 n
-    static member op_Explicit (n:BigRational) = BigRational.ToDouble n
-    static member op_Explicit (n:BigRational) = BigRational.ToBigInt n
-
-
-    override n.ToString() = 
-        match n with 
-        | Z z -> z.ToString()
-        | Q q -> q.ToString()
-
-    member x.StructuredDisplayString = x.ToString()
-                   
-    static member Parse(s:string) = Q (BigRationalLarge.Parse s)
-
-//module internal NumericLiteralN = 
-//    let FromZero () = BigRational.Zero 
-//    let FromOne () = BigRational.One 
-//    let FromInt32 i = BigRational.FromInt i
-//    let FromInt64 (i64:int64) = BigRational.FromBigInt (new BigInteger(i64))
-//    let FromString s = BigRational.Parse s
-
-
-// The only publicly-exposed member of this module.
+/// Infinite-precision rational number.
 type ratio = BigRational
+
+//
+let numerator_ratio (r : ratio) : big_int =
+    r.Numerator
+
+//
+let denominator_ratio (r : ratio) : big_int =
+    r.Denominator
+
+////
+//let normalize_ratio (r : ratio) =
+//    raise <| System.NotImplementedException "Ratio.normalize_ratio"
+
+(*
+
+val null_denominator : ratio -> bool
+val sign_ratio : ratio -> int
+val normalize_ratio : ratio -> ratio
+val cautious_normalize_ratio : ratio -> ratio
+val cautious_normalize_ratio_when_printing : ratio -> ratio
+val create_ratio : big_int -> big_int -> ratio
+val create_normalized_ratio : big_int -> big_int -> ratio
+val is_normalized_ratio : ratio -> bool
+val report_sign_ratio : ratio -> big_int -> big_int
+val abs_ratio : ratio -> ratio
+val is_integer_ratio : ratio -> bool
+val add_ratio : ratio -> ratio -> ratio
+val minus_ratio : ratio -> ratio
+val add_int_ratio : int -> ratio -> ratio
+val add_big_int_ratio : big_int -> ratio -> ratio
+val sub_ratio : ratio -> ratio -> ratio
+val mult_ratio : ratio -> ratio -> ratio
+val mult_int_ratio : int -> ratio -> ratio
+val mult_big_int_ratio : big_int -> ratio -> ratio
+val square_ratio : ratio -> ratio
+val inverse_ratio : ratio -> ratio
+val div_ratio : ratio -> ratio -> ratio
+val integer_ratio : ratio -> big_int
+val floor_ratio : ratio -> big_int
+val round_ratio : ratio -> big_int
+val ceiling_ratio : ratio -> big_int
+val eq_ratio : ratio -> ratio -> bool
+val compare_ratio : ratio -> ratio -> int
+val lt_ratio : ratio -> ratio -> bool
+val le_ratio : ratio -> ratio -> bool
+val gt_ratio : ratio -> ratio -> bool
+val ge_ratio : ratio -> ratio -> bool
+val max_ratio : ratio -> ratio -> ratio
+val min_ratio : ratio -> ratio -> ratio
+val eq_big_int_ratio : big_int -> ratio -> bool
+val compare_big_int_ratio : big_int -> ratio -> int
+val lt_big_int_ratio : big_int -> ratio -> bool
+val le_big_int_ratio : big_int -> ratio -> bool
+val gt_big_int_ratio : big_int -> ratio -> bool
+val ge_big_int_ratio : big_int -> ratio -> bool
+val int_of_ratio : ratio -> int
+val ratio_of_int : int -> ratio
+val ratio_of_nat : nat -> ratio
+val nat_of_ratio : ratio -> nat
+val ratio_of_big_int : big_int -> ratio
+val big_int_of_ratio : ratio -> big_int
+val div_int_ratio : int -> ratio -> ratio
+val div_ratio_int : ratio -> int -> ratio
+val div_big_int_ratio : big_int -> ratio -> ratio
+val div_ratio_big_int : ratio -> big_int -> ratio
+val approx_ratio_fix : int -> ratio -> string
+val approx_ratio_exp : int -> ratio -> string
+val float_of_rational_string : ratio -> string
+val string_of_ratio : ratio -> string
+val ratio_of_string : string -> ratio
+val float_of_ratio : ratio -> float
+val power_ratio_positive_int : ratio -> int -> ratio
+val power_ratio_positive_big_int : ratio -> big_int -> ratio
+
+*)
+
