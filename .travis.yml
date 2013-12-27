@@ -11,7 +11,7 @@ install:
   - sudo installer -pkg "MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg" -target /
   - mono .nuget/NuGet.exe install NUnit.Runners -Version 2.6.3 -OutputDirectory tools
 
-script: 
+script:
   - xbuild /property:Configuration=Release FSharp.Compatibility.sln
   - mono --runtime=v4.0.30319 ./tools/NUnit.Runners.2.6.3/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.Tests/bin/Release/FSharp.Compatibility.OCaml.Tests.dll
   - mono --runtime=v4.0.30319 ./tools/NUnit.Runners.2.6.3/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.System.Tests/bin/Release/FSharp.Compatibility.OCaml.System.Tests.dll
