@@ -4,8 +4,8 @@ FSharp.Compatibility
 Compatibility Libraries for F#
 ******************************
 
-.. image:: https://travis-ci.org/jack-pappas/FSharp.Compatibility.png  
-    :target: https://travis-ci.org/jack-pappas/FSharp.Compatibility
+.. image:: https://travis-ci.org/fsprojects/FSharp.Compatibility.png  
+    :target: https://travis-ci.org/fsprojects/FSharp.Compatibility
 
 This repository contains libraries which help adapt existing code in other languages to F#.
 
