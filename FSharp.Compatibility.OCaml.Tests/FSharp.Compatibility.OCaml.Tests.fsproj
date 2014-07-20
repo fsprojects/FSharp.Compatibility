@@ -48,10 +48,6 @@
     <Compile Include="PowerPack.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.PowerPack">
-      <HintPath>..\packages\FSPowerPack.Community.2.1.3.1\lib\Net40\FSharp.PowerPack.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="FsUnit.NUnit">
       <HintPath>..\packages\FsUnit.1.2.1.0\Lib\Net40\FsUnit.NUnit.dll</HintPath>
       <Private>True</Private>

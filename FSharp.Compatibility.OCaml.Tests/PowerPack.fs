@@ -29,6 +29,7 @@ open System.Numerics
 open Microsoft.FSharp.Math
 open FSharp.Compatibility.OCaml
 open FSharp.Compatibility.OCaml.Num
+open MathNet.Numerics
 open NUnit.Framework
 
 
