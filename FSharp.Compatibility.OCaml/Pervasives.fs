@@ -39,11 +39,13 @@ open System.Text
 
 (*** Exceptions ***)
 
-// raise
-// invalid_arg
-// failwith
-// exception Exit
+/// <summary>
+/// Raise exception <c>Invalid_argument</c> with the given string.
+/// </summary>
+let invalid_arg (str : string) =
+    raise <| Invalid_argument "str"
 
+// exception Exit
 
 
 (*** Comparisons ***)

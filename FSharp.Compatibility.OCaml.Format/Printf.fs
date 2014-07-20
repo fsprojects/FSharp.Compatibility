@@ -344,44 +344,44 @@ let kapr kpr fmt =
   | 1 ->
       Obj.magic
         (fun x ->
-           let a = Array.make 1 (Obj.repr 0) in (a.(0) <- x; kpr fmt a))
+           let a = Array.make 1 (Obj.repr 0) in (a.[0] <- x; kpr fmt a))
   | 2 ->
       Obj.magic
         (fun x y ->
            let a = Array.make 2 (Obj.repr 0)
-           in (a.(0) <- x; a.(1) <- y; kpr fmt a))
+           in (a.[0] <- x; a.[1] <- y; kpr fmt a))
   | 3 ->
       Obj.magic
         (fun x y z ->
            let a = Array.make 3 (Obj.repr 0)
-           in (a.(0) <- x; a.(1) <- y; a.(2) <- z; kpr fmt a))
+           in (a.[0] <- x; a.[1] <- y; a.[2] <- z; kpr fmt a))
   | 4 ->
       Obj.magic
         (fun x y z t ->
            let a = Array.make 4 (Obj.repr 0)
-           in (a.(0) <- x; a.(1) <- y; a.(2) <- z; a.(3) <- t; kpr fmt a))
+           in (a.[0] <- x; a.[1] <- y; a.[2] <- z; a.[3] <- t; kpr fmt a))
   | 5 ->
       Obj.magic
         (fun x y z t u ->
            let a = Array.make 5 (Obj.repr 0)
            in
-             (a.(0) <- x;
-              a.(1) <- y;
-              a.(2) <- z;
-              a.(3) <- t;
-              a.(4) <- u;
+             (a.[0] <- x;
+              a.[1] <- y;
+              a.[2] <- z;
+              a.[3] <- t;
+              a.[4] <- u;
               kpr fmt a))
   | 6 ->
       Obj.magic
         (fun x y z t u v ->
            let a = Array.make 6 (Obj.repr 0)
            in
-             (a.(0) <- x;
-              a.(1) <- y;
-              a.(2) <- z;
-              a.(3) <- t;
-              a.(4) <- u;
-              a.(5) <- v;
+             (a.[0] <- x;
+              a.[1] <- y;
+              a.[2] <- z;
+              a.[3] <- t;
+              a.[4] <- u;
+              a.[5] <- v;
               kpr fmt a))
   | nargs ->
       let rec loop i args =
@@ -389,7 +389,7 @@ let kapr kpr fmt =
         then
           (let a = Array.make nargs (Obj.repr 0)
            in
-             (list_iter_i (fun i arg -> a.((nargs - i) - 1) <- arg) args;
+             (list_iter_i (fun i arg -> a.[(nargs - i) - 1] <- arg) args;
               kpr fmt a))
         else Obj.magic (fun x -> loop (succ i) (x :: args))
       in loop 0 []

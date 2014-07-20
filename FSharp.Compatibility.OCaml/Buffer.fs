@@ -28,8 +28,6 @@ module FSharp.Compatibility.OCaml.Buffer
 // use of ocaml compat functions from Pervasives
 #nowarn "62"
 
-(*
-
 type t = System.Text.StringBuilder
 
 let create (n:int) = new System.Text.StringBuilder(n)
@@ -53,6 +51,4 @@ let add_channel (t:t) (c:in_channel) n =
 
 let output_buffer (os:out_channel) (t:t) = 
   output_string os (t.ToString())
-
-*)
 
