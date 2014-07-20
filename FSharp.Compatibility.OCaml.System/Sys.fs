@@ -31,7 +31,7 @@ open System
 open System.Collections.Generic
 open System.Diagnostics
 open System.IO
-//open System.Reflection
+open Mono.Unix
 open Microsoft.FSharp.Control
 
 #if FX_NO_COMMAND_LINE_ARGS
@@ -86,6 +86,8 @@ let command (s : string) =
         match System.Environment.OSVersion.Platform with
         | System.PlatformID.Win32NT ->
             System.Diagnostics.ProcessStartInfo ("cmd", "/c " + s)
+        | System.PlatformID.Unix ->
+            System.Diagnostics.ProcessStartInfo ("/bin/sh", s)
         | platform ->
             let msg = sprintf "This function is not currently supported on this platform. (PlatformID = %O)" platform
             raise <| System.NotSupportedException (msg)
