@@ -602,8 +602,8 @@ module ListCompatTests =
 module PervasivesTests =
     [<Test>]
     let ExceptionMappings () : unit =
-        check "exception mappings"  true (try int_of_string "A" |> ignore; false with Failure _ -> true | _ -> false)
-        check "exception mappings"  true (try float_of_string "A" |> ignore; false with Failure _ -> true | _ -> false)
+        check "exception mappings (int)"  true (try int_of_string "A" |> ignore; false with Failure _ -> true | _ -> false)
+        check "exception mappings (float)"  true (try float_of_string "A" |> ignore; false with Failure _ -> true | _ -> false)
 
     [<Test>]
     let BasicTests () : unit =
@@ -740,68 +740,94 @@ module PervasivesTests =
 [<TestFixture>]
 module FilenameTests =
     [<Test>]
-    let BasicTests () : unit =
-        check "Filename.dirname1"  "C:" (Filename.dirname "C:")
-        check "Filename.dirname2"  "C:\\" (Filename.dirname "C:\\")
-        check "Filename.dirname3"  "c:\\" (Filename.dirname "c:\\")
-        check "Filename.dirname2"  "C:/" (Filename.dirname "C:/")
-        check "Filename.dirname3"  "c:/" (Filename.dirname "c:/")
-        check "Filename.dirname4"  "." (Filename.dirname "")
-        check "Filename.dirname5"  "\\" (Filename.dirname "\\")
-        check "Filename.dirname6"  "." (Filename.dirname "a")
-        // F# and OCaml do return different results for this one.
-        // F# preserves the double slashes.  That seems fair enough 
-        // do check "Filename.dirname2"  "\\" (Filename.dirname "\\\\")
+    let dirname () : unit =
+        // These tests only work on Windows.
+        // For now, we ignore them when running on other platforms, but it'd be nice to have some cross-platform tests too.
+        if System.Environment.OSVersion.Platform <> System.PlatformID.Win32NT then
+            Assert.Ignore "These tests are currently designed to run on Windows, so they will be skipped on this platform."
+        else
+            check "Filename.dirname1"  "C:" (Filename.dirname "C:")
+            check "Filename.dirname2"  "C:\\" (Filename.dirname "C:\\")
+            check "Filename.dirname3"  "c:\\" (Filename.dirname "c:\\")
+            check "Filename.dirname2"  "C:/" (Filename.dirname "C:/")
+            check "Filename.dirname3"  "c:/" (Filename.dirname "c:/")
+            check "Filename.dirname4"  "." (Filename.dirname "")
+            check "Filename.dirname5"  "\\" (Filename.dirname "\\")
+            check "Filename.dirname6"  "." (Filename.dirname "a")
+            // F# and OCaml do return different results for this one.
+            // F# preserves the double slashes.  That seems fair enough 
+            // do check "Filename.dirname2"  "\\" (Filename.dirname "\\\\")
 
-        check "is_relative1"  false (Filename.is_relative "C:")
-        check "is_relative2"  false (Filename.is_relative "C:\\")
-        check "is_relative3"  false (Filename.is_relative "c:\\")
-        check "is_relative4"  false (Filename.is_relative "C:/")
-        check "is_relative5"  false (Filename.is_relative "c:/")
-        check "is_relative6"  true (Filename.is_relative "")
-        check "is_relative7"  true (Filename.is_relative ".")
-        check "is_relative8"  true (Filename.is_relative "a")
-        check "is_relative9"  false (Filename.is_relative "\\")
-        check "is_relative10"  false (Filename.is_relative "\\\\")
+            check "Filename.dirname1"  "" (Filename.basename "C:")
+            check "Filename.dirname2"  "" (Filename.basename "C:\\")
+            check "Filename.dirname2"  "" (Filename.basename "c:\\")
+            check "Filename.dirname2"  "" (Filename.basename "")
+            check "Filename.dirname2"  "c" (Filename.basename "\\\\c")
+            check "Filename.dirname2"  "" (Filename.basename "\\\\")
 
-        check "is_relative8"  true (Filename.is_implicit "a")
-        check "is_relative8"  false (Filename.is_implicit ".\\a")
-        check "is_relative8"  false (Filename.is_implicit "..\\a")
+    [<Test>]
+    let is_relative () : unit =
+        // These tests only work on Windows.
+        // For now, we ignore them when running on other platforms, but it'd be nice to have some cross-platform tests too.
+        if System.Environment.OSVersion.Platform <> System.PlatformID.Win32NT then
+            Assert.Ignore "These tests are currently designed to run on Windows, so they will be skipped on this platform."
+        else
+            check "is_relative1"  false (Filename.is_relative "C:")
+            check "is_relative2"  false (Filename.is_relative "C:\\")
+            check "is_relative3"  false (Filename.is_relative "c:\\")
+            check "is_relative4"  false (Filename.is_relative "C:/")
+            check "is_relative5"  false (Filename.is_relative "c:/")
+            check "is_relative6"  true (Filename.is_relative "")
+            check "is_relative7"  true (Filename.is_relative ".")
+            check "is_relative8"  true (Filename.is_relative "a")
+            check "is_relative9"  false (Filename.is_relative "\\")
+            check "is_relative10"  false (Filename.is_relative "\\\\")
 
-        let has_extension (s:string) = 
-          (String.length s >= 1 && String.get s (String.length s - 1) = '.') 
-          || System.IO.Path.HasExtension(s)
+            check "is_relative8"  true (Filename.is_implicit "a")
+            check "is_relative8"  false (Filename.is_implicit ".\\a")
+            check "is_relative8"  false (Filename.is_implicit "..\\a")
 
-        check "has_extension 1"  false (has_extension "C:")
-        check "has_extension 2"  false (has_extension "C:\\")
-        check "has_extension 3"  false (has_extension "c:\\")
-        check "has_extension 4"  false (has_extension "")
-        check "has_extension 5"  true (has_extension ".")
-        check "has_extension 6"  false (has_extension "a")
-        check "has_extension 7"  true (has_extension "a.b")
-        check "has_extension 8"  true (has_extension ".b")
-        check "has_extension 9"  true (has_extension "c:\\a.b")
-        check "has_extension 10"  true (has_extension "c:\\a.")
+    [<Test>]
+    let has_extension () : unit =
+        // These tests only work on Windows.
+        // For now, we ignore them when running on other platforms, but it'd be nice to have some cross-platform tests too.
+        if System.Environment.OSVersion.Platform <> System.PlatformID.Win32NT then
+            Assert.Ignore "These tests are currently designed to run on Windows, so they will be skipped on this platform."
+        else
+            let has_extension (s:string) = 
+              (String.length s >= 1 && String.get s (String.length s - 1) = '.') 
+              || System.IO.Path.HasExtension(s)
 
-        check "chop_extension1"  true (try ignore(Filename.chop_extension "C:"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension2"  true (try ignore(Filename.chop_extension "C:\\"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension3"  true (try ignore(Filename.chop_extension "c:\\"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension4"  true (try ignore(Filename.chop_extension "C:/"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension5"  true (try ignore(Filename.chop_extension "c:/"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension6"  true (try ignore(Filename.chop_extension ""); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension7"  true (try ignore(Filename.chop_extension "a"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension8"  true (try ignore(Filename.chop_extension "c:\\a"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension9"  true (try ignore(Filename.chop_extension "c:\\foo.b\\a"); false with Invalid_argument  "chop_extension" -> true)
-        check "chop_extension10"  "" (Filename.chop_extension ".")
-        check "chop_extension11"  "a" (Filename.chop_extension "a.")
-        check "chop_extension12"  "c:\\a" (Filename.chop_extension "c:\\a.")
+            check "has_extension 1"  false (has_extension "C:")
+            check "has_extension 2"  false (has_extension "C:\\")
+            check "has_extension 3"  false (has_extension "c:\\")
+            check "has_extension 4"  false (has_extension "")
+            check "has_extension 5"  true (has_extension ".")
+            check "has_extension 6"  false (has_extension "a")
+            check "has_extension 7"  true (has_extension "a.b")
+            check "has_extension 8"  true (has_extension ".b")
+            check "has_extension 9"  true (has_extension "c:\\a.b")
+            check "has_extension 10"  true (has_extension "c:\\a.")
 
-        check "Filename.dirname1"  "" (Filename.basename "C:")
-        check "Filename.dirname2"  "" (Filename.basename "C:\\")
-        check "Filename.dirname2"  "" (Filename.basename "c:\\")
-        check "Filename.dirname2"  "" (Filename.basename "")
-        check "Filename.dirname2"  "c" (Filename.basename "\\\\c")
-        check "Filename.dirname2"  "" (Filename.basename "\\\\")
+    [<Test>]
+    let chop_extension () : unit =
+        // These tests only work on Windows.
+        // For now, we ignore them when running on other platforms, but it'd be nice to have some cross-platform tests too.
+        if System.Environment.OSVersion.Platform <> System.PlatformID.Win32NT then
+            Assert.Ignore "These tests are currently designed to run on Windows, so they will be skipped on this platform."
+        else
+            check "chop_extension1"  true (try ignore(Filename.chop_extension "C:"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension2"  true (try ignore(Filename.chop_extension "C:\\"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension3"  true (try ignore(Filename.chop_extension "c:\\"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension4"  true (try ignore(Filename.chop_extension "C:/"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension5"  true (try ignore(Filename.chop_extension "c:/"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension6"  true (try ignore(Filename.chop_extension ""); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension7"  true (try ignore(Filename.chop_extension "a"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension8"  true (try ignore(Filename.chop_extension "c:\\a"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension9"  true (try ignore(Filename.chop_extension "c:\\foo.b\\a"); false with Invalid_argument  "chop_extension" -> true)
+            check "chop_extension10"  "" (Filename.chop_extension ".")
+            check "chop_extension11"  "a" (Filename.chop_extension "a.")
+            check "chop_extension12"  "c:\\a" (Filename.chop_extension "c:\\a.")        
 
 
 #if FX_NO_DOUBLE_BIT_CONVERTER

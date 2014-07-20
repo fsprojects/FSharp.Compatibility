@@ -45,6 +45,13 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Sys.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj">
+      <Name>FSharp.Compatibility.OCaml</Name>
+      <Project>{dfe5f3b6-2bfb-46fc-a315-b3a841b3e566}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>

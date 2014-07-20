@@ -61,10 +61,13 @@ let rename (s : string) (s2 : string) =
 //
 [<CompilerMessage("This construct is for ML compatibility. Consider using System.Environment.GetEnvironmentVariable directly. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden=true)>]
 let getenv (s : string) =
-    match Environment.GetEnvironmentVariable s with 
-    | null ->
-        raise <| KeyNotFoundException "the given environment variable was not found"
-    | s -> s
+    if System.Object.ReferenceEquals (null, s) then
+        raise Not_found
+    else
+        match Environment.GetEnvironmentVariable s with 
+        | null ->
+            raise Not_found
+        | s -> s
 #endif
 
 #if FX_NO_PROCESS_START
@@ -78,10 +81,17 @@ let getenv (s : string) =
 // the program to run and the arguments independently.
 [<CompilerMessage("This construct is for ML compatibility. Consider using System.Diagnostics.Process directly. This message can be disabled using '--nowarn:62' or '#nowarn \"62\"'.", 62, IsHidden=true)>]
 let command (s : string) =
-    let p =
-        let psi = System.Diagnostics.ProcessStartInfo ("cmd", "/c " + s)
-        psi.UseShellExecute <- false
-        System.Diagnostics.Process.Start psi
+    let psi =
+        // Use platform-specific commands to run the specified command.
+        match System.Environment.OSVersion.Platform with
+        | System.PlatformID.Win32NT ->
+            System.Diagnostics.ProcessStartInfo ("cmd", "/c " + s)
+        | platform ->
+            let msg = sprintf "This function is not currently supported on this platform. (PlatformID = %O)" platform
+            raise <| System.NotSupportedException (msg)
+    
+    psi.UseShellExecute <- false
+    let p = System.Diagnostics.Process.Start psi
     p.WaitForExit ()
     p.ExitCode
 #endif
