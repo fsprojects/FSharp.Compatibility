@@ -68,6 +68,17 @@ exception Invalid_argument of string
 // by the built-in F# Failure pattern?
 exception Failure of string
 
+[<CompiledName("FailurePattern")>]
+let (|Failure|_|) (ex : exn) =
+    // This allows us to match both the Failure exception defined above and System.Exception
+    // (raised by functions such as 'failwith') so the exception is matched as expected no matter
+    // how it was raised.
+    match ex with
+    | :? Failure as failure ->
+        Some failure.Data0
+    | _ ->
+        Microsoft.FSharp.Core.Operators.(|Failure|_|) ex
+
 /// Exception raised by search functions when the desired object could not be found.
 exception Not_found
 
