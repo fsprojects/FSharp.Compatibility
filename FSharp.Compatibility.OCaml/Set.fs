@@ -26,6 +26,7 @@ limitations under the License.
 module FSharp.Compatibility.OCaml.Set
 
 open System.Collections.Generic
+open Microsoft.FSharp.Collections
 
 
 let cardinal (s : Set<'T>) = s.Count

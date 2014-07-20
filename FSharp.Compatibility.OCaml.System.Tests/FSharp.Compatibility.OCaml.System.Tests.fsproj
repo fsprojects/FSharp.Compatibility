@@ -43,6 +43,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="PowerPack.fs" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj">

@@ -67,8 +67,16 @@
     <Compile Include="String.fs" />
     <Compile Include="List.fs" />
     <Compile Include="Seq.fs" />
+    <Compile Include="TaggedCollections.fsi" />
+    <Compile Include="TaggedCollections.fs" />
     <Compile Include="Map.fs" />
     <Compile Include="Set.fs" />
+    <Compile Include="HashMultiMap.fsi" />
+    <Compile Include="HashMultiMap.fs" />
+    <Compile Include="HashSet.fsi" />
+    <Compile Include="HashSet.fs" />
+    <Compile Include="TaggedHash.fsi" />
+    <Compile Include="TaggedHash.fs" />
     <Compile Include="Hashtbl.fs" />
     <Compile Include="Stack.fs" />
     <Compile Include="Queue.fs" />
@@ -83,8 +91,8 @@
     <Compile Include="Num.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.PowerPack">
-      <HintPath>..\packages\FSPowerPack.Community.2.1.3.1\lib\Net40\FSharp.PowerPack.dll</HintPath>
+    <Reference Include="FsLexYacc.Runtime">
+      <HintPath>..\packages\FsLexYacc.Runtime.6.0.2\lib\net40\FsLexYacc.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MathNet.Numerics">
