@@ -194,7 +194,11 @@ module SysTests =
 #else
     [<Test>]
     let Test_Sys_command () : unit =
-
+        // This test currently only works correctly on Windows.
+        // It'd be nice to fix it so it also works on non-Windows platforms.
+        if System.Environment.OSVersion.Platform <> System.PlatformID.Win32NT then
+            Assert.Ignore "This test is currently designed for Windows, so it is skipped for non-Windows platforms. Please consider contributing tests for Sys.command which works on non-Windows platforms."
+        else
           test "ekj" (Sys.command "help.exe" |> ignore; true)
 #endif
 
