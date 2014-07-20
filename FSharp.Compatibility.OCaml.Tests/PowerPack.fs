@@ -629,94 +629,97 @@ module PervasivesTests =
 
         test "ftefwiu32" (try raise Foo with Not_found | Out_of_memory | Division_by_zero |  Stack_overflow -> false | Foo -> true | _ -> false)
   
+
+    let private checkFileContentsUsingVariousTechniques(filename) =
+        using (open_in_bin filename) <| fun is -> 
+            let buf = Array.create 5 0uy in
+            check "cewjk1" (input is buf 0 5) 5;
+            check "cewjk2" buf [|104uy; 101uy; 108uy; 108uy; 111uy|];
+            check "cewjk3" (input is buf 0 2) 2;
+            check "cewjk4" buf [|13uy; 10uy; 108uy; 108uy; 111uy|]
+
+        using (open_in_bin filename) <| fun is2 -> 
+            check "cewjk5" (is2.Peek()) 104;
+            check "cewjk6" (is2.Read()) 104;
+            check "cewjk7" (is2.Read()) 101;
+            check "cewjk8" (is2.Read()) 108;
+            check "cewjk9" (is2.Read()) 108;
+            check "cewjk0" (is2.Read()) 111;
+            check "cewjkq" (is2.Read()) 13;
+            check "cewjkw" (is2.Read()) 10;
+            check "cewjke" (is2.Read()) (-1)
+
+        using (open_in_bin filename) <| fun is3 -> 
+            check "cewjkr" (input_char is3) 'h';
+            check "cewjkt" (input_char is3) 'e';
+            check "cewjky" (input_char is3) 'l';
+            check "cewjku" (input_char is3) 'l';
+            check "cewjki" (input_char is3) 'o';
+            check "cewjko" (input_char is3) '\r';
+            check "cewjkp" (input_char is3) '\n';
+            check "cewjka" (try input_char is3 |> ignore; false with End_of_file -> true) true
+
+        using (open_in_bin filename) <| fun is4 -> 
+            let buf4 = Array.create 5 '0' in
+            check "cewjks" (input_chars is4 buf4 0 5) 5;
+            check "cewjkd" (buf4) [|'h'; 'e'; 'l'; 'l'; 'o'; |];
+            check "cewjkf" (input_chars is4 buf4 0 2) 2;
+            check "cewjkd" (buf4) [|'\r'; '\n'; 'l'; 'l'; 'o'; |];
+            check "cewjkh" (input_chars is4 buf4 0 2) 0
+            
+        using (open_in filename) <| fun is5 -> 
+            let buf5 = Array.create 5 0uy in
+            check "veswhek1" (input is5 buf5 0 5) 5;
+            check "veswhek2" buf5 [|104uy; 101uy; 108uy; 108uy; 111uy|];
+            check "veswhek3" (input is5 buf5 0 2)  2;
+            check "veswhek4" buf5 [|13uy; 10uy; 108uy; 108uy; 111uy|];
+            check "veswhek5" (input is5 buf5 0 2) 0
+
+        using (open_in filename) <| fun is2 -> 
+            check "veswhek6" (is2.Peek()) 104;
+            check "veswhek7" (is2.Read()) 104;
+            check "veswhek8" (is2.Read()) 101;
+            check "veswhek9" (is2.Read()) 108;
+            check "veswhek0" (is2.Read()) 108;
+            check "veswhekq" (is2.Read()) 111;
+            check "veswhekw" (is2.Read()) 13;
+            check "veswheke" (is2.Read()) 10;
+            check "veswhekr" (is2.Read()) (-1)
+
+        using (open_in filename) <| fun is3 -> 
+            check "veswhekt" (input_char is3) 'h';
+            check "veswheky" (input_char is3) 'e';
+            check "veswheku" (input_char is3) 'l';
+            check "veswheko" (input_char is3) 'l';
+            check "veswhekp" (input_char is3) 'o';
+            check "veswheka" (input_char is3) '\r';
+            check "veswheks" (input_char is3) '\n';
+            check "veswhekd" (try input_char is3 |> ignore; false with End_of_file -> true) true
+
     [<Test>]
     let IO_EndOfLine_Translations () : unit =
-
-        let checkFileContentsUsingVariousTechniques(filename) =
-            using (open_in_bin filename) (fun is -> 
-                let buf = Array.create 5 0uy in
-                check "cewjk1" (input is buf 0 5) 5;
-                check "cewjk2" buf [|104uy; 101uy; 108uy; 108uy; 111uy|];
-                check "cewjk3" (input is buf 0 2) 2;
-                check "cewjk4" buf [|13uy; 10uy; 108uy; 108uy; 111uy|]);
-
-            using (open_in_bin filename) (fun is2 -> 
-
-                check "cewjk5" (is2.Peek()) 104;
-                check "cewjk6" (is2.Read()) 104;
-                check "cewjk7" (is2.Read()) 101;
-                check "cewjk8" (is2.Read()) 108;
-                check "cewjk9" (is2.Read()) 108;
-                check "cewjk0" (is2.Read()) 111;
-                check "cewjkq" (is2.Read()) 13;
-                check "cewjkw" (is2.Read()) 10;
-                check "cewjke" (is2.Read()) (-1));
-
-            using (open_in_bin filename) (fun is3 -> 
-
-                check "cewjkr" (input_char is3) 'h';
-                check "cewjkt" (input_char is3) 'e';
-                check "cewjky" (input_char is3) 'l';
-                check "cewjku" (input_char is3) 'l';
-                check "cewjki" (input_char is3) 'o';
-                check "cewjko" (input_char is3) '\r';
-                check "cewjkp" (input_char is3) '\n';
-                check "cewjka" (try input_char is3 |> ignore; false with End_of_file -> true) true);
-
-            using (open_in_bin filename) (fun is4 -> 
-
-                let buf4 = Array.create 5 '0' in
-                check "cewjks" (input_chars is4 buf4 0 5) 5;
-                check "cewjkd" (buf4) [|'h'; 'e'; 'l'; 'l'; 'o'; |];
-                check "cewjkf" (input_chars is4 buf4 0 2) 2;
-                check "cewjkd" (buf4) [|'\r'; '\n'; 'l'; 'l'; 'o'; |];
-                check "cewjkh" (input_chars is4 buf4 0 2) 0);
-            
-            using (open_in filename) (fun is5 -> 
-
-                let buf5 = Array.create 5 0uy in
-                check "veswhek1" (input is5 buf5 0 5) 5;
-                check "veswhek2" buf5 [|104uy; 101uy; 108uy; 108uy; 111uy|];
-                check "veswhek3" (input is5 buf5 0 2)  2;
-                check "veswhek4" buf5 [|13uy; 10uy; 108uy; 108uy; 111uy|];
-                check "veswhek5" (input is5 buf5 0 2) 0);
-            
-
-            using (open_in filename) (fun is2 -> 
-
-                check "veswhek6" (is2.Peek()) 104;
-                check "veswhek7" (is2.Read()) 104;
-                check "veswhek8" (is2.Read()) 101;
-                check "veswhek9" (is2.Read()) 108;
-                check "veswhek0" (is2.Read()) 108;
-                check "veswhekq" (is2.Read()) 111;
-                check "veswhekw" (is2.Read()) 13;
-                check "veswheke" (is2.Read()) 10;
-                check "veswhekr" (is2.Read()) (-1));
-
-
-            using (open_in filename) (fun is3 -> 
-
-                check "veswhekt" (input_char is3) 'h';
-                check "veswheky" (input_char is3) 'e';
-                check "veswheku" (input_char is3) 'l';
-                check "veswheko" (input_char is3) 'l';
-                check "veswhekp" (input_char is3) 'o';
-                check "veswheka" (input_char is3) '\r';
-                check "veswheks" (input_char is3) '\n';
-                check "veswhekd" (try input_char is3 |> ignore; false with End_of_file -> true) true)
-
-        using (open_out_bin "test.txt") (fun os -> fprintf os "hello\r\n")
+        using (open_out_bin "test.txt") <| fun os ->
+            fprintf os "hello\r\n"
         checkFileContentsUsingVariousTechniques("test.txt")
-        using (open_out "test.txt") (fun os -> fprintf os "hello\r\n")
+
+        using (open_out "test.txt") <| fun os ->
+            fprintf os "hello\r\n"
         checkFileContentsUsingVariousTechniques("test.txt")
-        using (open_out "test.txt") (fun os -> os.Write (let s = "hello\r\n" in Array.init s.Length (fun i -> s.[i]) ))
+        
+        using (open_out "test.txt") <| fun os ->
+            os.Write (let s = "hello\r\n" in Array.init s.Length (fun i -> s.[i]) )
         checkFileContentsUsingVariousTechniques("test.txt")
-        using (open_out_bin "test.txt") (fun os -> os.Write (let s = "hello\r\n" in Array.init s.Length (fun i -> s.[i]) ))
+        
+        using (open_out_bin "test.txt") <| fun os ->
+            os.Write (let s = "hello\r\n" in Array.init s.Length (fun i -> s.[i]) )
         checkFileContentsUsingVariousTechniques("test.txt")
-        using (open_out "test.txt") (fun os -> os.Write "hello\r\n")
+        
+        using (open_out "test.txt") <| fun os ->
+            os.Write "hello\r\n"
         checkFileContentsUsingVariousTechniques("test.txt")
-        using (open_out_bin "test.txt") (fun os -> os.Write "hello\r\n")
+        
+        using (open_out_bin "test.txt") <| fun os ->
+            os.Write "hello\r\n"
         checkFileContentsUsingVariousTechniques("test.txt")
 
 #if FX_NO_BINARY_SERIALIZATION
