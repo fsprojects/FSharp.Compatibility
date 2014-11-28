@@ -49,3 +49,13 @@ License
 The projects in this repository are licensed under the terms of the `Apache 2.0 license` unless otherwise stated.
 
 .. _`Apache 2.0 license`: http://www.apache.org/licenses/LICENSE-2.0
+
+Maintainer(s)
+=============
+
+- `@jack-pappas`_
+
+The default maintainer account for projects under "fsprojects" is `@fsgit`_ - F# Community Project Incubation Space (repo management)
+
+.. _`@jack-pappas`: https://github.com/jack-pappas
+.. _`@fsgit`: https://github.com/fsgit
