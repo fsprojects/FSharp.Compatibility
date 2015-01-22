@@ -1,3 +1,8 @@
+.. image:: http://issuestats.com/github/fsprojects/FSharp.Compatibility/badge/issue  
+    :target: http://issuestats.com/github/fsprojects/FSharp.Compatibility
+.. image:: http://issuestats.com/github/fsprojects/FSharp.Compatibility/badge/pr  
+    :target: http://issuestats.com/github/fsprojects/FSharp.Compatibility
+    
 ####################
 FSharp.Compatibility
 ####################
