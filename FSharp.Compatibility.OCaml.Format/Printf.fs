@@ -4,7 +4,7 @@
     Copyright (c) 1996  Institut National de Recherche en
                         Informatique et en Automatique
     Copyright (c) Jack Pappas 2012
-        http://github.com/jack-pappas
+        http://github.com/fsprojects
 
     This code is distributed under the terms of the
     GNU Lesser General Public License (LGPL) v2.1.

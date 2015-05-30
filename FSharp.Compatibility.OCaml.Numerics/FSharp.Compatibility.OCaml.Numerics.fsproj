@@ -5,15 +5,15 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{e7a0ae32-362c-49bf-afb7-d3466453973a}</ProjectGuid>
+    <ProjectGuid>{f5616c78-3812-4919-9d09-c1d37080ed0e}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FSharp.Compatibility.OCaml.System.Tests</RootNamespace>
-    <AssemblyName>FSharp.Compatibility.OCaml.System.Tests</AssemblyName>
+    <RootNamespace>FSharp.Compatibility.OCaml.Numerics</RootNamespace>
+    <AssemblyName>FSharp.Compatibility.OCaml.Numerics</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <Name>FSharp.Compatibility.OCaml.System.Tests</Name>
+    <Name>FSharp.Compatibility.OCaml.Numerics</Name>
+    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +23,8 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\FSharp.Compatibility.OCaml.System.Tests.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\FSharp.Compatibility.OCaml.Numerics.XML</DocumentationFile>
+    <NoWarn>62</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +33,8 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\FSharp.Compatibility.OCaml.System.Tests.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\FSharp.Compatibility.OCaml.Numerics.XML</DocumentationFile>
+    <NoWarn>62</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -50,36 +52,42 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <Compile Include="PowerPack.fs" />
+    <Compile Include="..\_Common\CommonAssemblyInfo.fs">
+      <Link>CommonAssemblyInfo.fs</Link>
+    </Compile>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Ratio.fs" />
+    <Compile Include="Num.fs" />
+    <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj">
-      <Name>FSharp.Compatibility.OCaml</Name>
-      <Project>{dfe5f3b6-2bfb-46fc-a315-b3a841b3e566}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <Reference Include="FSharp.Core">
+      <HintPath>..\packages\FSharp.Core.3.1.2.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FsUnit.NUnit">
-      <HintPath>..\packages\FsUnit.1.2.1.0\Lib\Net40\FsUnit.NUnit.dll</HintPath>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\packages\MathNet.Numerics.3.7.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MathNet.Numerics.FSharp">
+      <HintPath>..\packages\MathNet.Numerics.FSharp.3.7.0\lib\net40\MathNet.Numerics.FSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\FSharp.Compatibility.OCaml.System\FSharp.Compatibility.OCaml.System.fsproj">
-      <Name>FSharp.Compatibility.OCaml.System</Name>
-      <Project>{3eb634ce-737d-446e-8720-0d84c595a814}</Project>
+    <ProjectReference Include="..\FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj">
+      <Name>FSharp.Compatibility.OCaml</Name>
+      <Project>{dfe5f3b6-2bfb-46fc-a315-b3a841b3e566}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

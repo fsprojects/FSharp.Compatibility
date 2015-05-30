@@ -2,7 +2,7 @@
 
     Copyright (c) Microsoft Corporation 2005-2009
     Copyright (c) Jack Pappas 2012
-        http://github.com/jack-pappas
+        http://github.com/fsprojects
 
     This code is distributed under the terms of the Apache 2.0 license.
     See the LICENSE file for details. *)
@@ -49,9 +49,9 @@ let [<Literal>] private assemblyConfig =
 [<assembly: ComVisible(false)>]
 
 // Version information
-[<assembly: AssemblyVersion("0.1.11")>]
-[<assembly: AssemblyFileVersion("0.1.11")>]
-[<assembly: AssemblyInformationalVersion("0.1.11")>]
+[<assembly: AssemblyVersion("0.1.12")>]
+[<assembly: AssemblyFileVersion("0.1.12")>]
+[<assembly: AssemblyInformationalVersion("0.1.12")>]
 
 // Only allow types derived from System.Exception to be thrown --
 // any other types should be automatically wrapped.

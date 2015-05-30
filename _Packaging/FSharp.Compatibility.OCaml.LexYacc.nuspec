@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>FSharp.Compatibility.OCaml.Format</id>
+        <id>FSharp.Compatibility.OCaml.LexYacc</id>
         <version>0.1.12</version>
         <dependencies>
             <dependency id="FSharp.Compatibility.OCaml" version="0.1.12" />
         </dependencies>
-        <title>OCaml Compatibility Library for F# (Format module)</title>
+        <title>OCaml Compatibility Library for F# (Parsing and Lexing modules)</title>
         <authors>Jack Pappas</authors>
         <owners />
         <licenseUrl>http://opensource.org/licenses/LGPL-2.1</licenseUrl>
         <projectUrl>https://github.com/fsprojects/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>The Format module from the OCaml Standard Library, adapted to F#.</description>
+        <description>The Parsing and Lexing modules from the OCaml Standard Library, adapted to F#.</description>
         <tags>fsharp ocaml compatibility</tags>
     </metadata>
     <files>
-        <file src="..\FSharp.Compatibility.OCaml.Format\bin\Release\FSharp.Compatibility.OCaml.Format.XML" target="lib\net40\FSharp.Compatibility.OCaml.Format.XML" />
-        <file src="..\FSharp.Compatibility.OCaml.Format\bin\Release\FSharp.Compatibility.OCaml.Format.dll" target="lib\net40\FSharp.Compatibility.OCaml.Format.dll" />
+        <file src="..\FSharp.Compatibility.OCaml.LexYacc\bin\Release\FSharp.Compatibility.OCaml.LexYacc.XML" target="lib\net40\FSharp.Compatibility.OCaml.LexYacc.XML" />
+        <file src="..\FSharp.Compatibility.OCaml.LexYacc\bin\Release\FSharp.Compatibility.OCaml.LexYacc.dll" target="lib\net40\FSharp.Compatibility.OCaml.LexYacc.dll" />
     </files>
 </package>

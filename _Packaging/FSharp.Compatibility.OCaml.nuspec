@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharp.Compatibility.OCaml</id>
-        <version>0.1.11</version>
+        <version>0.1.12</version>
         <dependencies>
             <dependency id="FSPowerPack.Community" version="2.1.3.1" />
         </dependencies>
@@ -10,7 +10,7 @@
         <authors>Jack Pappas</authors>
         <owners />
         <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
-        <projectUrl>https://github.com/jack-pappas/FSharp.Compatibility</projectUrl>
+        <projectUrl>https://github.com/fsprojects/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A re-implementation of the OCaml standard library in F# to ease porting and promote cross-compatibility.</description>
         <tags>fsharp ocaml compatibility</tags>

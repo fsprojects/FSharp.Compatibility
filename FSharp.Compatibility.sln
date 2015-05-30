@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3F4B7398-DFE7-4911-B479-E2D16A8134D9}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -23,6 +25,10 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.Scala", "FSharp.Compatibility.Scala\FSharp.Compatibility.Scala.fsproj", "{0A30B6F0-AD6A-4AD5-83AF-860EA98C81C0}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.System.Tests", "FSharp.Compatibility.OCaml.System.Tests\FSharp.Compatibility.OCaml.System.Tests.fsproj", "{E7A0AE32-362C-49BF-AFB7-D3466453973A}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.LexYacc", "FSharp.Compatibility.OCaml.LexYacc\FSharp.Compatibility.OCaml.LexYacc.fsproj", "{FD30C463-7F83-483C-AF97-64B58A39A997}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Compatibility.OCaml.Numerics", "FSharp.Compatibility.OCaml.Numerics\FSharp.Compatibility.OCaml.Numerics.fsproj", "{F5616C78-3812-4919-9D09-C1D37080ED0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +67,14 @@ Global
 		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7A0AE32-362C-49BF-AFB7-D3466453973A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD30C463-7F83-483C-AF97-64B58A39A997}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD30C463-7F83-483C-AF97-64B58A39A997}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD30C463-7F83-483C-AF97-64B58A39A997}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD30C463-7F83-483C-AF97-64B58A39A997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5616C78-3812-4919-9D09-C1D37080ED0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5616C78-3812-4919-9D09-C1D37080ED0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5616C78-3812-4919-9D09-C1D37080ED0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5616C78-3812-4919-9D09-C1D37080ED0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

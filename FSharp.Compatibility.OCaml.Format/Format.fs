@@ -4,7 +4,7 @@
     Copyright (c) 1996  Institut National de Recherche en 
                         Informatique et en Automatique
     Copyright (c) Jack Pappas 2012
-        http://github.com/jack-pappas
+        http://github.com/fsprojects
 
     This code is distributed under the terms of the
     GNU Lesser General Public License (LGPL) v2.1.
@@ -462,9 +462,7 @@ let clear_scan_stack state = state.pp_scan_stack <- scan_stack_bottom
    since scan_push is used on breaks and opening of boxes. *)
 let set_size state ty =
   match state.pp_scan_stack with
-  | Scan_elem (left_tot,
-      (({ elem_size = size; token = tok; length = _ } as queue_elem))) :: t
-      ->
+  | Scan_elem (left_tot,(({ elem_size = size; token = tok; length = _ } as queue_elem))) :: t ->
       let size = int_of_size size
       in
         (* test if scan stack contains any data that is not obsolete. *)
