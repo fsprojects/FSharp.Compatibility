@@ -58,9 +58,9 @@ The projects in this repository are licensed under the terms of the `Apache 2.0 
 Maintainer(s)
 =============
 
-- `@fsprojects`_
+- `@jack-pappas`_
 
 The default maintainer account for projects under "fsprojects" is `@fsgit`_ - F# Community Project Incubation Space (repo management)
 
-.. _`@fsprojects`: https://github.com/fsprojects
+.. _`@jack-pappas`: https://github.com/jack-pappas
 .. _`@fsgit`: https://github.com/fsgit
