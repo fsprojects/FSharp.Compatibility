@@ -22,6 +22,14 @@ OCaml
 
   The OCaml Core library and most of the Standard Library.
 
+- `FSharp.Compatibility.OCaml.Numerics`_ 
+
+  The Ratio and Num modules from the OCaml Standard Library. Provided as a separate assembly for dependency reasons.
+
+- `FSharp.Compatibility.OCaml.LexYacc`_ 
+
+  The Parsing and Lexing modules from the OCaml Standard Library. Provided as a separate assembly for dependency reasons.
+
 - `FSharp.Compatibility.OCaml.Format`_ **(LGPL v2)**
 
   The Format module from the OCaml Standard Library.
@@ -35,6 +43,8 @@ OCaml
   This is provided as a separate assembly to avoid taking additional dependencies in the **FSharp.Compatibility.OCaml** project.
 
 .. _`FSharp.Compatibility.OCaml`: https://nuget.org/packages/FSharp.Compatibility.OCaml
+.. _`FSharp.Compatibility.OCaml.LexYacc`: https://nuget.org/packages/FSharp.Compatibility.OCaml.LexYacc
+.. _`FSharp.Compatibility.OCaml.Numerics`: https://nuget.org/packages/FSharp.Compatibility.OCaml.Numerics
 .. _`FSharp.Compatibility.OCaml.Format`: https://nuget.org/packages/FSharp.Compatibility.OCaml.Format
 .. _`FSharp.Compatibility.OCaml.System`: https://nuget.org/packages/FSharp.Compatibility.OCaml.System
 
@@ -58,9 +68,9 @@ The projects in this repository are licensed under the terms of the `Apache 2.0 
 Maintainer(s)
 =============
 
-- `@jack-pappas`_
+.. _`@jack-pappas`: https://github.com/jack-pappas
+.. _`@jmquigs`: https://github.com/jmquigs
 
 The default maintainer account for projects under "fsprojects" is `@fsprojectsgit`_ - F# Community Project Incubation Space (repo management)
 
-.. _`@jack-pappas`: https://github.com/jack-pappas
 .. _`@fsprojectsgit`: https://github.com/fsprojectsgit
