@@ -9,7 +9,7 @@
         <title>OCaml Compatibility Library for F# (Parsing and Lexing modules)</title>
         <authors>Jack Pappas</authors>
         <owners />
-        <licenseUrl>http://opensource.org/licenses/LGPL-2.1</licenseUrl>
+        <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
         <projectUrl>https://github.com/fsprojects/FSharp.Compatibility</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>The Parsing and Lexing modules from the OCaml Standard Library, adapted to F#.</description>
