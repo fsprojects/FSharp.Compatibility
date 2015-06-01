@@ -457,7 +457,18 @@ type OutChannelImpl internal (w : writer) =
     member x.Writer
         with get () = writer
         and set w = writer <- w
-    
+
+    override x.Write(c:char[]) = x.Write(c, 0, c.Length)
+    override x.Write(s:string) = x.Write(s.ToCharArray())
+    override x.Write(c:char) = x.Write([| c |])
+    override x.Write((c:char[]),(index:int),(count:int)) = 
+        match writer with
+        | StreamW sw ->
+            (sw :> TextWriter).Write(c,index,count)
+        | TextW tw ->
+            (tw ()).Write(c,index,count)
+        | BinaryW br ->
+            br.Write(c,index,count)
     //
     member x.Stream =
         match writer with
@@ -490,6 +501,15 @@ type OutChannelImpl internal (w : writer) =
         | _ ->
             failwith "cannot access a binary writer for this channel"
 
+    interface System.IDisposable with 
+        member x.Dispose() = 
+            match writer with
+            | TextW tw -> 
+                (tw() :> IDisposable).Dispose() 
+            | BinaryW bw -> 
+                (bw :> IDisposable).Dispose()
+            | StreamW sw -> 
+                (sw :> IDisposable).Dispose()
 
 //
 type reader =
@@ -539,6 +559,12 @@ type InChannelImpl internal (r : reader) =
         | BinaryR w -> w
         | _ -> failwith "cannot access a binary writer for this channel"
 
+    override x.Peek() = 
+        match reader with
+        | BinaryR bw ->  bw.PeekChar()
+        | TextR tr -> (tr()).Peek()
+        | StreamR sr -> sr.Peek()
+
     //
     override __.Read () =
         match reader with
@@ -559,6 +585,15 @@ type InChannelImpl internal (r : reader) =
         | TextR tr ->
             (tr ()).Read (buffer, index, count)
 
+    interface System.IDisposable with 
+        member x.Dispose() = 
+            match reader with
+            | TextR tr -> 
+                (tr() :> IDisposable).Dispose() 
+            | BinaryR br -> 
+                (br :> IDisposable).Dispose()
+            | StreamR sr -> 
+                (sr :> IDisposable).Dispose()
 
 //
 let private (!!) (os : out_channel) =
@@ -584,7 +619,14 @@ let private stream_to_BinaryWriter s =
 
 //
 let private stream_to_StreamWriter (encoding : Encoding) (s : Stream) =
-    StreamW (new StreamWriter (s, encoding))
+    // on mono, the StreamWriter constructor will emit a UTF-8 BOM if you pass the encoding to the constructor (even
+    // if it is the default encoding).  For consistency with windows, which does not do this, don't pass the encoding 
+    // unless it differs from the default.  (NOTE: if we don't do this, some tests fail because they don't expect a BOM.
+    // could modify them to watch for the BOM, since it is technically acceptable.)
+    if encoding = System.Text.Encoding.Default then
+        StreamW (new StreamWriter (s)) 
+    else
+        StreamW (new StreamWriter (s, encoding))
 
 //
 module private OutChannel =
@@ -1011,7 +1053,7 @@ let prim_input_char (is : in_channel) =
 let input_char (is : in_channel) = 
     match !!!is with
     | BinaryR _ ->
-        char_of_int (input_byte is)
+        try char_of_int (input_byte is) with :? System.IO.EndOfStreamException -> raise End_of_file
     | TextR tr ->
         let b = (tr()).Read ()
         if b = -1 then raise End_of_file
