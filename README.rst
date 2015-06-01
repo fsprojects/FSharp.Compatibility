@@ -60,7 +60,7 @@ Maintainer(s)
 
 - `@jack-pappas`_
 
-The default maintainer account for projects under "fsprojects" is `@fsgit`_ - F# Community Project Incubation Space (repo management)
+The default maintainer account for projects under "fsprojects" is `@fsprojectsgit`_ - F# Community Project Incubation Space (repo management)
 
 .. _`@jack-pappas`: https://github.com/jack-pappas
-.. _`@fsgit`: https://github.com/fsgit
+.. _`@fsprojectsgit`: https://github.com/fsprojectsgit
