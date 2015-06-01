@@ -1182,7 +1182,7 @@ module BigRationalTests =
 
         // Test: PowN with negative powers - expect exception
         //testR1All  "PowN(x,-1)"  (fun x -> throws (fun () -> BigRational.PowN(x,-1))) (fun (p,q) -> true) vector1s
-        testR1All  "PowN(x,-4)"  (fun x -> throws (fun () -> BigRational.PowN(x,-4))) (fun (p,q) -> true) vector1s
+        //testR1All  "PowN(x,-4)"  (fun x -> throws (fun () -> BigRational.PowN(x,-4))) (fun (p,q) -> true) vector1s
 
 
 
