@@ -50,6 +50,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Printf.fs" />
     <Compile Include="Format.fs" />
+    <None Include="paket.references" />    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Compatibility.OCaml\FSharp.Compatibility.OCaml.fsproj">
@@ -74,5 +75,5 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="$(SolutionDir)\.paket\paket.targets" />
 </Project>

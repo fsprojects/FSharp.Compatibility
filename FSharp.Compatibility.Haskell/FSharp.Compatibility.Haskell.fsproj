@@ -47,6 +47,7 @@
     </Compile>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Prelude.fs" />
+    <None Include="paket.references" />    
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -64,5 +65,5 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="$(SolutionDir)\.paket\paket.targets" />
 </Project>

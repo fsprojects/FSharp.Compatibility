@@ -50,9 +50,9 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
+  <Import Project="$(SolutionDir)\.paket\paket.targets" />
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="paket.references" />
     <None Include="app.config" />
     <Compile Include="Num.fs" />
     <Compile Include="Array.fs" />

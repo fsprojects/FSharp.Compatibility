@@ -52,7 +52,7 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Import Project="$(SolutionDir)\.paket\paket.targets" />
   <ItemGroup>
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">
       <Link>CommonAssemblyInfo.fs</Link>
@@ -75,7 +75,7 @@
     <Compile Include="Real.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="TopLevel.fs" />
-    <Content Include="packages.config" />
+    <Content Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ExtCore">
