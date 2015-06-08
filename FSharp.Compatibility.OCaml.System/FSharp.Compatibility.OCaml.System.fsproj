@@ -65,7 +65,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Posix">
-      <HintPath>..\packages\Mono.Posix.4.0.0.0\lib\net40\Mono.Posix.dll</HintPath>
+      <HintPath>..\packages\Mono.Posix\lib\net40\Mono.Posix.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
