@@ -3,3 +3,10 @@ version: '{build}'
 artifacts:
   - path: bin
     name: release
+platform:
+  - Any CPU
+configuration:
+  - Release
+test:
+  assemblies:
+    - '**\*.Tests.dll'
