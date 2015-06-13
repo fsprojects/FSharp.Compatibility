@@ -63,6 +63,16 @@ exception Undefined
 [<Obsolete("Code which raises Invalid_argument should be changed to raise System.ArgumentException instead.")>]
 exception Invalid_argument of string
 
+[<CompiledName("InvalidArgumentPattern")>]
+let (|Invalid_argument|_|) (ex : exn) =
+    // This allows us to match both the Invalid_argument type and System.ArgumentException
+    match ex with
+    | :? Invalid_argument as ia ->
+        Some ia.Data0
+    | :? System.ArgumentException as ae ->
+        Some ae.Message
+    | _ -> None
+
 /// Exception raised by library functions to signal that they are undefined on the given arguments.
 // TODO : Should this just be an alias for System.Exception (exn) so it can be matched
 // by the built-in F# Failure pattern?
