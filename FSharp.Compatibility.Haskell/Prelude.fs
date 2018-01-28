@@ -146,18 +146,18 @@ let replicate  n x = List.replicate  n x
 
 open System.Reflection
 let cycle lst =
-    let mutable last = lst
+    let last = ref lst
     let rec copy = function
         | [] -> failwith "empty list"
         | [z] -> 
             let v = [z]
-            last <- v
+            last.Value <- v
             v
         | x::xs ->  x::copy xs
     let cycled = copy lst
-    let strs = last.GetType().GetFields(BindingFlags.NonPublic ||| BindingFlags.Instance) |> Array.map (fun field -> field.Name)
-    let tailField = last.GetType().GetField(Array.find(fun (s:string) -> s.ToLower().Contains("tail")) strs, BindingFlags.NonPublic ||| BindingFlags.Instance)
-    tailField.SetValue(last, cycled)
+    let strs = last.Value.GetType().GetFields(BindingFlags.NonPublic ||| BindingFlags.Instance) |> Array.map (fun field -> field.Name)
+    let tailField = last.Value.GetType().GetField(Array.find(fun (s:string) -> s.ToLower().Contains("tail")) strs, BindingFlags.NonPublic ||| BindingFlags.Instance)
+    tailField.SetValue(last.Value, cycled)
     cycled
 
 let drop i list = 
