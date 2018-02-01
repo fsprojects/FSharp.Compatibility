@@ -1,6 +1,7 @@
 source https://nuget.org/api/v2
 
 nuget FSharp.Formatting
+nuget FSharpPlus 1.0.0-CI00089 CI
 nuget NUnit 
 nuget NUnit.Runners
 nuget FAKE
@@ -14,4 +15,3 @@ nuget FsUnit
 nuget MathNet.Numerics
 nuget MathNet.Numerics.FSharp
 nuget Mono.Posix
-
