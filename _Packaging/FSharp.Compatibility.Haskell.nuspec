@@ -6,7 +6,7 @@
         <dependencies>
         </dependencies>
         <title>Haskell 98 Compatibility Library for F#</title>
-        <authors>Jack Pappas</authors>
+        <authors>Jack Pappas,Gustavo Leon</authors>
         <owners />
         <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
         <projectUrl>https://github.com/fsprojects/FSharp.Compatibility</projectUrl>
