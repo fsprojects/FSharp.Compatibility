@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharp.Compatibility.Haskell</id>
-        <version>0.1.12</version>
+        <version>0.1.13</version>
         <dependencies>
         </dependencies>
         <title>Haskell 98 Compatibility Library for F#</title>
-        <authors>Jack Pappas</authors>
+        <authors>Jack Pappas,Gustavo Leon</authors>
         <owners />
         <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
         <projectUrl>https://github.com/fsprojects/FSharp.Compatibility</projectUrl>

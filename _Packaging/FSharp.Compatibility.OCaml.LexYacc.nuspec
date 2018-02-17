@@ -2,9 +2,9 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharp.Compatibility.OCaml.LexYacc</id>
-        <version>0.1.12</version>
+        <version>0.1.13</version>
         <dependencies>
-            <dependency id="FSharp.Compatibility.OCaml" version="0.1.12" />
+            <dependency id="FSharp.Compatibility.OCaml" version="0.1.13" />
         </dependencies>
         <title>OCaml Compatibility Library for F# (Parsing and Lexing modules)</title>
         <authors>Jack Pappas</authors>

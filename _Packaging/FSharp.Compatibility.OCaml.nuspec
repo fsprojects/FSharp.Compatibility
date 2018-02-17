@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>FSharp.Compatibility.OCaml</id>
-        <version>0.1.12</version>
+        <version>0.1.13</version>
         <dependencies>
         </dependencies>
         <title>OCaml Compatibility Library for F#</title>
