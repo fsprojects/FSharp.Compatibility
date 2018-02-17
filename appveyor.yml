@@ -1,12 +1,37 @@
 os: Windows Server 2012 R2
 version: '{build}'
 artifacts:
-  - path: bin
-    name: release
+  - path: FSharp.Compatibility.OCaml\bin\Release
+    name: FSharp.Compatibility.OCaml
+  - path: FSharp.Compatibility.OCaml.Format\bin\Release
+    name: FSharp.Compatibility.OCaml.Format
+  - path: FSharp.Compatibility.OCaml.LexYacc\bin\Release
+    name: FSharp.Compatibility.OCaml.LexYacc    
+  - path: FSharp.Compatibility.OCaml.Numerics\bin\Release
+    name: FSharp.Compatibility.OCaml.Numerics    
+  - path: FSharp.Compatibility.OCaml.System\bin\Release
+    name: FSharp.Compatibility.OCaml.System    
+  - path: FSharp.Compatibility.Scala\bin\Release
+    name: FSharp.Compatibility.Scala
+  - path: FSharp.Compatibility.StandardML\bin\Release
+    name: FSharp.Compatibility.StandardML
+  - path: FSharp.Compatibility.Haskell\bin\Release
+    name: FSharp.Compatibility.Haskell    
+  - path: FSharp.Compatibility.*.nupkg
+    
 platform:
   - Any CPU
 configuration:
   - Release
+after_test:
+  - nuget pack _Packaging\FSharp.Compatibility.Haskell.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.OCaml.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.OCaml.Format.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.OCaml.LexYacc.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.OCaml.Numerics.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.OCaml.System.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.StandardML.nuspec
+  - nuget pack _Packaging\FSharp.Compatibility.Scala.nuspec
 test:
   assemblies:
     - '**\*.Tests.dll'
