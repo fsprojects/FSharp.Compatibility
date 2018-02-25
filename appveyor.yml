@@ -1,4 +1,8 @@
-os: Windows Server 2012 R2
+image: Visual Studio 2017
+build_script:
+   - .\.paket\paket.bootstrapper.exe
+   - .\.paket\paket.exe restore
+   - msbuild /property:Configuration=Release FSharp.Compatibility.sln 
 version: '{build}'
 artifacts:
   - path: FSharp.Compatibility.OCaml\bin\Release
