@@ -1,11 +1,8 @@
 language: csharp
 
-#env:
-#  global:
-#    - EnableNuGetPackageRestore=true
-
-#install:
-#  - mono .nuget/NuGet.exe install NUnit.Runners -Version 2.6.3 -OutputDirectory tools
+install:
+  - mono .paket/paket.bootstrapper.exe
+  - mono .paket/paket.exe restore
 
 script:
   - xbuild /property:Configuration=Release FSharp.Compatibility.sln
