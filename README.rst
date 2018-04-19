@@ -48,6 +48,14 @@ OCaml
 .. _`FSharp.Compatibility.OCaml.Format`: https://nuget.org/packages/FSharp.Compatibility.OCaml.Format
 .. _`FSharp.Compatibility.OCaml.System`: https://nuget.org/packages/FSharp.Compatibility.OCaml.System
 
+Haskell
+=======
+
+- `FSharp.Compatibility.Haskell`_
+
+  Common Haskell operators, functions and type abbreviations to match commmon Haskell types.
+
+.. _`FSharp.Compatibility.Haskell`: https://nuget.org/packages/FSharp.Compatibility.Haskell
 
 Standard ML (SML)
 =================
