@@ -53,7 +53,7 @@ Haskell
 
 - `FSharp.Compatibility.Haskell`_
 
-  Common Haskell operators, functions and type abbreviations to match commmon Haskell types.
+  Common Haskell operators, functions and type abbreviations to match common Haskell types.
 
 .. _`FSharp.Compatibility.Haskell`: https://nuget.org/packages/FSharp.Compatibility.Haskell
 
