@@ -29,7 +29,6 @@ limitations under the License.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharp.Compatibility.OCaml.Big_int
 
-open System.Collections.Generic
 open System.Numerics
 
 
