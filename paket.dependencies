@@ -5,6 +5,7 @@ nuget FSharpPlus 1.0.0-CI00089 CI
 nuget NUnit 
 nuget NUnit.Runners
 nuget FAKE
+nuget FSharp.Core
 nuget SourceLink.Fake
 
 github fsharp/FAKE modules/Octokit/Octokit.fsx
