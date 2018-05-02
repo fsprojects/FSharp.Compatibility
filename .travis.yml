@@ -1,5 +1,5 @@
 language: csharp
-mono: latest
+mono: 4.8.1
 install:
   - mono .paket/paket.bootstrapper.exe
   - mono .paket/paket.exe restore
