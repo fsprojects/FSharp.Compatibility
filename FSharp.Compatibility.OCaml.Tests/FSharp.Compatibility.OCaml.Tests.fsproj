@@ -12,7 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
-    <None Include="app.config" />
     <Compile Include="Num.fs" />
     <Compile Include="Array.fs" />
     <Compile Include="PowerPack.fs" />
