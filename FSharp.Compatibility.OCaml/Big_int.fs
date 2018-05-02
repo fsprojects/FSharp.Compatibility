@@ -199,13 +199,11 @@ let inline private of_hex' (s: string): big_int =
 let inline private is_bin (c: char): bool =
     c = '0' || c = '1'
 let inline private is_oct (c: char): bool =
-    let code = Char.code c
-    code >= 48 && code <= 56
+    let dec = oct_to_dec c
+    dec >= 0 && dec <= 7
 let inline private is_hex (c: char): bool =
-       let code = Char.code c
-       (code >= 48 && code <= 57)
-    || (code >= 65 && code <= 70)
-    || (code >= 97 && code <= 102)
+    let dec = hex_to_dec c
+    dec >= 0 && dec <= 15
 
 let inline private of_bin (s: string): big_int =
     if Seq.forall is_bin s then 
