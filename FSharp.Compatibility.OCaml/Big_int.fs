@@ -29,6 +29,7 @@ limitations under the License.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module FSharp.Compatibility.OCaml.Big_int
 
+open System.Collections.Generic
 open System.Numerics
 
 
@@ -173,11 +174,40 @@ let num_digits_big_int (x : big_int) : int =
 let inline string_of_big_int (x : big_int) : string =
     x.ToString ()
 
-/// Convert a string to a big integer, in decimal.
-/// The string consists of an optional - or + sign, followed by one or several decimal digits.
-let inline big_int_of_string (str : string) : big_int =
-    BigInteger.Parse str
+let private digits: Map<char, big_int> =
+    "0123456789ABCDEF"
+    |> Seq.mapi (fun index char -> char, bigint index)
+    |> Map.ofSeq
 
+// Converts a string of base (b <= 16) to decimal bigint
+let private of_base (b: int) (s: string): big_int =
+    let aux (total: big_int) (c: char): big_int = 
+        (total + Map.find c digits) * bigint b
+    Seq.fold aux 0I s
+    / big_int b
+
+let private of_bin: string -> big_int = of_base 2 
+let private of_oct: string -> big_int = of_base 8
+let private of_hex: string -> big_int = of_base 16
+
+/// Convert a string to a big integer, in decimal.
+/// The string consists of an optional - or + sign, 
+/// followed by an optional format specifier 
+/// ("0x", "0o", "0b" for hex, octal, and binary respectively),
+/// followed by one or several decimal digits.
+let rec big_int_of_string (str : string) : big_int =
+    if   str.StartsWith("-")
+        then - big_int_of_string (str.Substring 1)
+    elif str.StartsWith("+")
+        then   big_int_of_string (str.Substring 1)
+    elif str.StartsWith("0x")
+        then of_hex <| str.Substring 2
+    elif str.StartsWith("0o")
+        then of_oct <| str.Substring 2
+    elif str.StartsWith("0b")
+        then of_bin <| str.Substring 2
+    else
+        BigInteger.Parse str
 
 (*** Conversions to and from other numerical types ***)
 
