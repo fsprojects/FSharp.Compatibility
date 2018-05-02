@@ -174,43 +174,90 @@ let num_digits_big_int (x : big_int) : int =
 let inline string_of_big_int (x : big_int) : string =
     x.ToString ()
 
-let private digits: Map<char, big_int> =
-    "0123456789ABCDEF"
-    |> Seq.mapi (fun index char -> char, bigint index)
-    |> Map.ofSeq
-
-// Converts a string of base (b <= 16) to decimal bigint
-let private of_base (b: int) (s: string): big_int =
+// Converts a string of base b to decimal bigint.
+// to_dec gives the decimal representation of each character.
+let private of_base (b: int) (to_dec: char -> int) (s: string): big_int =
     let aux (total: big_int) (c: char): big_int = 
-        (total + Map.find c digits) * bigint b
+        (total + bigint (to_dec c)) * bigint b
     Seq.fold aux 0I s
     / big_int b
 
-let private of_bin: string -> big_int = of_base 2 
-let private of_oct: string -> big_int = of_base 8
-let private of_hex: string -> big_int = of_base 16
+let inline private bin_to_dec (c: char): int = Char.code c - 48
+let inline private oct_to_dec (c: char): int = Char.code c - 48
+let inline private hex_to_dec (c: char): int =
+    let code = Char.code c
+    if   code >= 97 then code - 87 // 'a' - 'f'
+    elif code >= 65 then code - 55 // 'A' - 'F'
+    else code - 48
 
-/// Convert a string to a big integer, in decimal.
+let inline private of_bin' (s: string): big_int =
+    of_base 2 bin_to_dec s
+let inline private of_oct' (s: string): big_int =
+    of_base 8 oct_to_dec s
+let inline private of_hex' (s: string): big_int =
+    of_base 16 hex_to_dec s
+
+let inline private is_bin (c: char): bool =
+    c = '0' || c = '1'
+let inline private is_oct (c: char): bool =
+    let code = Char.code c
+    code >= 48 && code <= 56
+let inline private is_hex (c: char): bool =
+       let code = Char.code c
+       (code >= 48 && code <= 57)
+    || (code >= 65 && code <= 70)
+    || (code >= 97 && code <= 102)
+
+let inline private of_bin (s: string): big_int =
+    if Seq.forall is_bin s then 
+        of_bin' s
+    else 
+        sprintf "0b%s is not a valid binary string" s
+        |> System.FormatException
+        |> raise
+let inline private of_oct (s: string): big_int =
+    if Seq.forall is_oct s then 
+        of_oct' s
+    else 
+        sprintf "0o%s is not a valid octal string" s
+        |> System.FormatException
+        |> raise
+let inline private of_hex (s: string): big_int =
+    if Seq.forall is_bin s then 
+        of_hex' s
+    else 
+        sprintf "0x%s is not a valid hexadecimal string" s
+        |> System.FormatException
+        |> raise
+
+/// Convert a string to a big integer.
+/// The string consists of an optional format specifier 
+/// ("0x", "0o", "0b" for hex, octal, and binary respectively),
+/// followed by one or several hex, octal, binary, or decimal digits.
+let inline private big_int_of_string' (s: string): big_int =
+    if s.StartsWith("0x")
+        then of_hex <| s.Substring 2
+    elif s.StartsWith("0o")
+        then of_oct <| s.Substring 2
+    elif s.StartsWith("0b")
+        then of_bin <| s.Substring 2
+    else
+        BigInteger.Parse s
+
+/// Convert a string to a big integer.
 /// The string consists of an optional - or + sign, 
 /// followed by an optional format specifier 
 /// ("0x", "0o", "0b" for hex, octal, and binary respectively),
-/// followed by one or several decimal digits.
-let rec big_int_of_string (str : string) : big_int =
-    if   str.StartsWith("-")
-        then - big_int_of_string (str.Substring 1)
-    elif str.StartsWith("+")
-        then   big_int_of_string (str.Substring 1)
-    elif str.StartsWith("0x")
-        then of_hex <| str.Substring 2
-    elif str.StartsWith("0o")
-        then of_oct <| str.Substring 2
-    elif str.StartsWith("0b")
-        then of_bin <| str.Substring 2
+/// followed by one or several hex, octal, binary, or decimal digits.
+let big_int_of_string (s: string): big_int =
+    if s.StartsWith("-")
+        then -(big_int_of_string' (s.Substring 1))
+    elif s.StartsWith("+")
+        then big_int_of_string' (s.Substring 1)
     else
-        BigInteger.Parse str
+        big_int_of_string' s
 
 (*** Conversions to and from other numerical types ***)
-
 // TODO
 
 
