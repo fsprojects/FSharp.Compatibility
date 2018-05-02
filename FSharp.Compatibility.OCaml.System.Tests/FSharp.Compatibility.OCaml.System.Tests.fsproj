@@ -6,7 +6,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>FSharp.Compatibility.OCaml.System.Tests</RootNamespace>
     <AssemblyName>FSharp.Compatibility.OCaml.System.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Name>FSharp.Compatibility.OCaml.System.Tests</Name>
     <WarningLevel>3</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFramework>net461</TargetFramework>
     <ProjectGuid>{6a12d691-8475-4579-a71b-eba478f70c4b}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>FSharp.Compatibility.Haskell</RootNamespace>
