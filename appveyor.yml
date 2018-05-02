@@ -2,6 +2,7 @@ image: Visual Studio 2017
 build_script:
    - .\.paket\paket.bootstrapper.exe
    - .\.paket\paket.exe restore
+   - msbuild /t:restore
    - msbuild /property:Configuration=Release FSharp.Compatibility.sln 
 version: '{build}'
 artifacts:
