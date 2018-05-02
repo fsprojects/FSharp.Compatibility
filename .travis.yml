@@ -1,5 +1,6 @@
 language: csharp
 mono: latest
+dotnet: 2.1.105
 install:
   - mono .paket/paket.bootstrapper.exe
   - mono .paket/paket.exe restore
