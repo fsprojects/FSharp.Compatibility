@@ -222,7 +222,7 @@ let inline private of_oct (s: string): big_int =
         |> System.FormatException
         |> raise
 let inline private of_hex (s: string): big_int =
-    if Seq.forall is_bin s then 
+    if Seq.forall is_hex s then 
         of_hex' s
     else 
         sprintf "0x%s is not a valid hexadecimal string" s
