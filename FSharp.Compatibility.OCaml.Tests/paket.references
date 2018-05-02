@@ -2,3 +2,4 @@ FsUnit
 MathNet.Numerics
 MathNet.Numerics.FSharp
 NUnit
+FSharp.Core
