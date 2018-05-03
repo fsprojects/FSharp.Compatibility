@@ -38,5 +38,5 @@ after_test:
   - nuget pack _Packaging\FSharp.Compatibility.StandardML.nuspec
   - nuget pack _Packaging\FSharp.Compatibility.Scala.nuspec
 test_script:
-  - ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.Tests/bin/Release/FSharp.Compatibility.OCaml.Tests.dll
-  - ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.System.Tests/bin/Release/FSharp.Compatibility.OCaml.System.Tests.dll
+  - dotnet test --no-build ./FSharp.Compatibility.OCaml.Tests/
+  - dotnet test --no-build ./FSharp.Compatibility.OCaml.System.Tests/

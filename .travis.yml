@@ -7,6 +7,6 @@ install:
 
 script:
   - msbuild /property:Configuration=Release FSharp.Compatibility.sln
-  - mono --runtime=v4.0.30319 ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.Tests/bin/Release/FSharp.Compatibility.OCaml.Tests.dll
-  - mono --runtime=v4.0.30319 ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.System.Tests/bin/Release/FSharp.Compatibility.OCaml.System.Tests.dll
+  - dotnet test --no-build ./FSharp.Compatibility.OCaml.Tests/bin/
+  - dotnet test --no-build ./FSharp.Compatibility.OCaml.System.Tests/
 

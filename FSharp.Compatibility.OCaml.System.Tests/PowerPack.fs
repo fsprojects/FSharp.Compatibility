@@ -34,7 +34,7 @@ exception Foo
 module private TestHelpers =
     open System
 
-    let test msg b = Assert.IsTrue(b, "MiniTest '" + msg + "'")
+    let test msg (b:bool) = Assert.IsTrue(condition=b, message= "MiniTest '" + msg + "'")
     let logMessage msg = 
         System.Console.WriteLine("LOG:" + msg)
 //        System.Diagnostics.Trace.WriteLine("LOG:" + msg)

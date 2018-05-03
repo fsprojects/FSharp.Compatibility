@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net46</TargetFramework>
     <ProjectGuid>{e82a40ea-fff1-471c-84e0-843d9f288e8c}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>FSharp.Compatibility.OCaml.Tests</RootNamespace>
