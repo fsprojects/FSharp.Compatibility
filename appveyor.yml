@@ -3,7 +3,7 @@ build_script:
    - .\.paket\paket.bootstrapper.exe
    - .\.paket\paket.exe restore
    - msbuild /t:restore
-   - msbuild /property:Configuration=Release FSharp.Compatibility.sln 
+   - dotnet build /property:Configuration=Release FSharp.Compatibility.sln 
 version: '{build}'
 artifacts:
   - path: FSharp.Compatibility.OCaml\bin\Release
@@ -37,6 +37,6 @@ after_test:
   - nuget pack _Packaging\FSharp.Compatibility.OCaml.System.nuspec
   - nuget pack _Packaging\FSharp.Compatibility.StandardML.nuspec
   - nuget pack _Packaging\FSharp.Compatibility.Scala.nuspec
-test:
-  assemblies:
-    - '**\*.Tests.dll'
+test_script:
+  - ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.Tests/bin/Release/FSharp.Compatibility.OCaml.Tests.dll
+  - ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.System.Tests/bin/Release/FSharp.Compatibility.OCaml.System.Tests.dll
