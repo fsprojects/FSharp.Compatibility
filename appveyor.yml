@@ -24,8 +24,6 @@ artifacts:
     name: FSharp.Compatibility.Haskell    
   - path: FSharp.Compatibility.*.nupkg
     
-platform:
-  - Any CPU
 configuration:
   - Release
 after_test:
