@@ -7,6 +7,6 @@ install:
 
 script:
   - msbuild /property:Configuration=Release FSharp.Compatibility.sln
-  - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.Tests/bin/
+  - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.Tests/
   - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.System.Tests/
 

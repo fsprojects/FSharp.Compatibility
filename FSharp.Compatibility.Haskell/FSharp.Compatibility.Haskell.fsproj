@@ -8,6 +8,23 @@
     <AssemblyName>FSharp.Compatibility.Haskell</AssemblyName>
     <Name>FSharp.Compatibility.Haskell</Name>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>FSharp.Compatibility.Haskell</PackageId>
+    <VersionPrefix>0.1.13</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+
+    <Title>Haskell 98 Compatibility Library for F#</Title>
+    <Authors>Jack Pappas,Gustavo Leon</Authors>
+    <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/FSharp.Compatibility</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Implementation of the Haskell 98 Prelude in F#.</Description>
+    <PackageTags>fsharp haskell prelude compatibility</PackageTags>
+
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

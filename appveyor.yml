@@ -27,14 +27,14 @@ artifacts:
 configuration:
   - Release
 after_test:
-  - nuget pack _Packaging\FSharp.Compatibility.Haskell.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.OCaml.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.OCaml.Format.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.OCaml.LexYacc.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.OCaml.Numerics.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.OCaml.System.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.StandardML.nuspec
-  - nuget pack _Packaging\FSharp.Compatibility.Scala.nuspec
+  - dotnet pack --configuration Release FSharp.Compatibility.Haskell
+  - dotnet pack --configuration Release FSharp.Compatibility.OCaml
+  - dotnet pack --configuration Release FSharp.Compatibility.OCaml.Format
+  - dotnet pack --configuration Release FSharp.Compatibility.OCaml.LexYacc
+  - dotnet pack --configuration Release FSharp.Compatibility.OCaml.Numerics
+  - dotnet pack --configuration Release FSharp.Compatibility.OCaml.System
+  - dotnet pack --configuration Release FSharp.Compatibility.StandardML
+  - dotnet pack --configuration Release FSharp.Compatibility.Scala
 test_script:
   - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.Tests/
   - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.System.Tests/

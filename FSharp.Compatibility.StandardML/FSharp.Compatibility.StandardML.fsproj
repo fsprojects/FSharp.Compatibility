@@ -10,6 +10,25 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningLevel>3</WarningLevel>
     <NoWarn>62</NoWarn>
+
+    <PackageId>FSharp.Compatibility.StandardML</PackageId>
+    <VersionPrefix>0.1.13</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+
+    <Title>Standard ML '97 Compatibility Library for F#</Title>
+    <Authors>Jack Pappas</Authors>
+    <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/FSharp.Compatibility</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Implementation of the Standard ML '97 Basis Library in F#.</Description>
+
+    <PackageTags>fsharp sml standard ml compatibility</PackageTags>
+
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\_Common\CommonAssemblyInfo.fs">

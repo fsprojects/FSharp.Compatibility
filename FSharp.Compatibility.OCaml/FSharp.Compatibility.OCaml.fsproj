@@ -10,6 +10,25 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>;9;44;60;35;42;62;86;47;40;51</NoWarn>
     <WarningLevel>3</WarningLevel>
+
+    <PackageId>FSharp.Compatibility.OCaml</PackageId>
+    <VersionPrefix>0.1.13</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+
+    <Title>OCaml Compatibility Library for F#</Title>
+    <Authors>Jack Pappas</Authors>
+    <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/FSharp.Compatibility</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>A re-implementation of the OCaml standard library in F# to ease porting and promote cross-compatibility.</Description>
+
+    <PackageTags>fsharp ocaml compatibility</PackageTags>
+    
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />

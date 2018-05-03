@@ -9,6 +9,25 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Name>FSharp.Compatibility.OCaml.System</Name>
     <WarningLevel>3</WarningLevel>
+
+    <PackageId>FSharp.Compatibility.OCaml.System</PackageId>
+    <VersionPrefix>0.1.13</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+
+    <Title>OCaml Compatibility Library for F# (System programming modules)</Title>
+    <Authors>Jack Pappas</Authors>
+    <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/FSharp.Compatibility</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Implementations of system programming modules from the OCaml Standard Library (e.g., Sys, Unix) in F#.</Description>
+
+    <PackageTags>fsharp ocaml compatibility</PackageTags>
+
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Unix.fs" />
