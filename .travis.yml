@@ -1,11 +1,12 @@
 language: csharp
-
+dotnet: 2.1.105
 install:
   - mono .paket/paket.bootstrapper.exe
   - mono .paket/paket.exe restore
+  - msbuild /t:restore
 
 script:
-  - xbuild /property:Configuration=Release FSharp.Compatibility.sln
-  - mono --runtime=v4.0.30319 ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.Tests/bin/Release/FSharp.Compatibility.OCaml.Tests.dll
-  - mono --runtime=v4.0.30319 ./packages/NUnit.Runners/tools/nunit-console.exe ./FSharp.Compatibility.OCaml.System.Tests/bin/Release/FSharp.Compatibility.OCaml.System.Tests.dll
+  - msbuild /property:Configuration=Release FSharp.Compatibility.sln
+  - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.Tests/
+  - dotnet test --no-build --configuration Release ./FSharp.Compatibility.OCaml.System.Tests/
 

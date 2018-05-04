@@ -55,9 +55,17 @@ _ReSharper*/
 # Office Temp Files
 ~$*
 
+# User preferences 
+*.userprefs
+# Project rider
+.idea/
+# Paket files ...
+paket-files/
 
 ###############################################################################
 # Project-specific patterns
 ###############################################################################
 
 ## Add any project-specific ignore patterns here, as needed.
+
+FSharp.Compatibility.OCaml.Tests/test.txt

@@ -2,8 +2,7 @@ source https://nuget.org/api/v2
 
 nuget FSharp.Formatting
 nuget FSharpPlus 1.0.0-CI00089 CI
-nuget NUnit 
-nuget NUnit.Runners
+nuget FSharp.Core 4.3.4
 nuget FAKE
 nuget SourceLink.Fake
 
@@ -11,7 +10,10 @@ github fsharp/FAKE modules/Octokit/Octokit.fsx
 
 nuget ExtCore
 nuget FsLexYacc.Runtime
-nuget FsUnit
+nuget NUnit ~> 3.
+nuget NUnit3TestAdapter ~> 3.
+nuget Microsoft.NET.Test.Sdk ~> 15.
+nuget FsUnit ~> 3.
 nuget MathNet.Numerics
 nuget MathNet.Numerics.FSharp
 nuget Mono.Posix

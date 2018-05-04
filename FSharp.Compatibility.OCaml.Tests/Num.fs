@@ -36,10 +36,8 @@ let ``0 does not equal 1``() =
 (* op_Division *)
 
 [<Test>]
-[<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
 let ``division by zero raises exception``() =
-    (Int 1) / (Int 0)
-    |> ignore
+    Assert.AreEqual("Division_by_zero", Assert.Throws<exn>(fun ()-> (Int 1) / (Int 0) |> ignore).Message)
 
 [<Test>]
 let ``division should not truncate result``() =
@@ -50,10 +48,8 @@ let ``division should not truncate result``() =
 (* op_Modulus *)
 
 [<Test>]
-[<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
 let ``mod_num zero divisor raises exception``() =
-    mod_num (Int 1) (Int 0)
-    |> ignore
+    Assert.AreEqual("Division_by_zero", Assert.Throws<exn>(fun ()-> mod_num (Int 1) (Int 0) |> ignore).Message)
 
 [<Test>]
 let ``mod_num test 1``() =
@@ -71,10 +67,8 @@ let ``mod_num test 2``() =
 (* Quotient *)
 
 [<Test>]
-[<ExpectedException(typeof<exn>, ExpectedMessage = "Division_by_zero")>]
 let ``quo_num zero divisor raises exception``() =
-    quo_num (Int 1) (Int 0)
-    |> ignore
+    Assert.AreEqual("Division_by_zero", Assert.Throws<exn>(fun ()-> quo_num (Int 1) (Int 0) |> ignore).Message)
 
 [<Test>]
 let ``quo_num should truncate result``() =
@@ -98,8 +92,6 @@ let ``num_of_string parse big integer``() =
     |> should equal (Big_int expectedValue)
 
 [<Test>]
-[<ExpectedException(typeof<exn>, ExpectedMessage = "num_of_string")>]
 let ``num_of_string invalid string``() =
-    num_of_string "123.4"
-    |> ignore
+    Assert.AreEqual("num_of_string", Assert.Throws<exn>(fun ()-> num_of_string "123.4" |> ignore).Message)
 
