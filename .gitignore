@@ -69,3 +69,6 @@ paket-files/
 ## Add any project-specific ignore patterns here, as needed.
 
 FSharp.Compatibility.OCaml.Tests/test.txt
+
+.vscode
+
