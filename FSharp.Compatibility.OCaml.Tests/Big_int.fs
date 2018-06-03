@@ -34,12 +34,12 @@ open FsUnit
 [<Test>]
 let Parse() =
     Assert.AreEqual(big_int_of_string "0",      zero_big_int, "1")
-    //Assert.AreEqual(big_int_of_string "0xABC",  bigint 2748,  "2")
+    Assert.AreEqual(big_int_of_string "0xABC",  bigint 2748,  "2")
     Assert.AreEqual(big_int_of_string "2748",   bigint 2748,  "3")
-    //Assert.AreEqual(big_int_of_string "-0xABC", bigint -2748, "4")
+    Assert.AreEqual(big_int_of_string "-0xABC", bigint -2748, "4")
     Assert.AreEqual(big_int_of_string "-2748",  bigint -2748, "5")
-    //Assert.AreEqual(big_int_of_string "0xabc",  bigint 2748,  "6")
-    //Assert.AreEqual(big_int_of_string "0xaBc",  bigint 2748,  "7")
+    Assert.AreEqual(big_int_of_string "0xabc",  bigint 2748,  "6")
+    Assert.AreEqual(big_int_of_string "0xaBc",  bigint 2748,  "7")
     //Assert.AreEqual(big_int_of_string "0o123",  bigint 291,   "8")
     //Assert.AreEqual(big_int_of_string "0b101",  bigint 5,     "9")
     Assert.AreEqual(big_int_of_string "5",  bigint 5,         "10")
