@@ -178,12 +178,12 @@ let inline fmap f x = map f x
 // Applicative functors
             
 let inline pure' x   = result x
-let inline empty()   = getZero()    
+let inline empty()   = getEmpty()
 let inline optional v = Just <!> v <|> pure' Nothing
 
 // Monoids
 
-let inline mempty() = getEmpty()
+let inline mempty() = getZero()
 let inline mappend a b = plus a b
 let inline mconcat s = Seq.sum s
 
@@ -257,7 +257,7 @@ let inline liftM  f m1    = m1 >>= (return' << f)
 let inline liftM2 f m1 m2 = m1 >>= fun x1 -> m2 >>= fun x2 -> return' (f x1 x2)
 let inline ap     x y     = liftM2 id x y
             
-let do' = new Builders.MonadFxBuilder()
+let do' = new Builders.MonadPlusBuilder()
 
 
 // Monad Plus
