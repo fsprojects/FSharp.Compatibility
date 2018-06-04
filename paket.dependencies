@@ -1,7 +1,7 @@
 source https://nuget.org/api/v2
 
 nuget FSharp.Formatting
-nuget FSharpPlus 1.0.0-CI00089 CI
+nuget FSharpPlus 1.0.0
 nuget FSharp.Core 4.3.4
 nuget FAKE
 nuget SourceLink.Fake

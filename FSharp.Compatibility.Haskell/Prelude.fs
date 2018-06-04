@@ -88,6 +88,7 @@ module FSharp.Compatibility.Haskell.Prelude
 
 open FSharpPlus
 open FSharpPlus.Data
+open FSharpPlus.Operators
 
 let getDual (Dual x) = x
 let getAll (All x) = x
@@ -177,14 +178,14 @@ let inline fmap f x = map f x
 // Applicative functors
             
 let inline pure' x   = result x
-let inline empty()   = getMZero()    
+let inline empty()   = getEmpty()
 let inline optional v = Just <!> v <|> pure' Nothing
 
 // Monoids
 
-let inline mempty() = getEmpty()
-let inline mappend a b = append a b
-let inline mconcat s = concat s
+let inline mempty() = getZero()
+let inline mappend a b = plus a b
+let inline mconcat s = Seq.sum s
 
 type Ordering = LT|EQ|GT with
     static member        Empty = EQ
@@ -207,7 +208,7 @@ let inline foldl (f: 'b -> 'a -> 'b) (z:'b) x :'b = fold     f z x
 
 
 // Numerics
-open GenericMath
+open FSharpPlus.Math.Generic
 
 type Integer = bigint
 
@@ -256,11 +257,11 @@ let inline liftM  f m1    = m1 >>= (return' << f)
 let inline liftM2 f m1 m2 = m1 >>= fun x1 -> m2 >>= fun x2 -> return' (f x1 x2)
 let inline ap     x y     = liftM2 id x y
             
-let do' = new Builders.MonadBuilder()
+let do' = new Builders.MonadPlusBuilder()
 
 
 // Monad Plus
-let inline mzero() = getMZero()
+let inline mzero() = getEmpty()
 let inline mplus (x:'a) (y:'a) : 'a = (<|>) x y
 let inline guard x = if x then return' () else mzero()
 
@@ -339,6 +340,6 @@ let inline throwError x   = throw x
 let inline catchError v h = catch v h
             
 // ErrorT
-let runErrorT = ErrorT.run
+let runErrorT = ChoiceT.run
 type ErrorT = ErrorT
 let ErrorT = ErrorT.ErrorT
