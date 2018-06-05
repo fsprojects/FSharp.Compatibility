@@ -15,6 +15,7 @@
     <Compile Include="Num.fs" />
     <Compile Include="Array.fs" />
     <Compile Include="PowerPack.fs" />
+    <Compile Include="Big_int.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Compatibility.OCaml.Format\FSharp.Compatibility.OCaml.Format.fsproj" />
