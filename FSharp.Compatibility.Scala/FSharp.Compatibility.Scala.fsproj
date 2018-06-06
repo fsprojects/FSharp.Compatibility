@@ -9,7 +9,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningLevel>3</WarningLevel>
 
-    <PackageId>FSharp.Compatibility.OCaml.Scala</PackageId>
+    <PackageId>FSharp.Compatibility.Scala</PackageId>
     <VersionPrefix>0.1.14</VersionPrefix>
     <VersionSuffix></VersionSuffix>
 
