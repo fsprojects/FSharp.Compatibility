@@ -9,7 +9,7 @@
     <Name>FSharp.Compatibility.Haskell</Name>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>FSharp.Compatibility.Haskell</PackageId>
-    <VersionPrefix>0.1.13</VersionPrefix>
+    <VersionPrefix>0.1.14</VersionPrefix>
     <VersionSuffix></VersionSuffix>
 
     <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>

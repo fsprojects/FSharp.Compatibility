@@ -49,9 +49,9 @@ let [<Literal>] private assemblyConfig =
 [<assembly: ComVisible(false)>]
 
 // Version information
-[<assembly: AssemblyVersion("0.1.13")>]
-[<assembly: AssemblyFileVersion("0.1.13")>]
-[<assembly: AssemblyInformationalVersion("0.1.13")>]
+[<assembly: AssemblyVersion("0.1.14")>]
+[<assembly: AssemblyFileVersion("0.1.14")>]
+[<assembly: AssemblyInformationalVersion("0.1.14")>]
 
 // Only allow types derived from System.Exception to be thrown --
 // any other types should be automatically wrapped.
